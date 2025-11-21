@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- DESIGN SYSTEM V6 --- */
+        /* --- DESIGN SYSTEM V7 --- */
         body { font-family: 'Outfit', sans-serif; background-color: #050505; color: white; -webkit-tap-highlight-color: transparent; }
 
         .bg-gradient-custom {
@@ -18,11 +18,14 @@
                         radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
         }
 
-        .glass {
+        /* Le panneau principal est maintenant un conteneur flex */
+        .glass-panel {
             background: rgba(22, 22, 26, 0.75);
             backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            border-radius: 32px;
+            overflow: hidden; /* Important pour garder les coins arrondis avec la sidebar */
         }
 
         .input-field {
@@ -33,17 +36,22 @@
         }
         ::placeholder { color: #4b5563; opacity: 1; }
 
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Sidebar Navigation */
+        .nav-sidebar { background: rgba(0,0,0,0.2); border-right: 1px solid rgba(255,255,255,0.05); }
 
-        .tab-btn { white-space: nowrap; transition: all 0.3s; opacity: 0.5; position: relative; padding-bottom: 8px; }
-        .tab-btn.active { opacity: 1; color: white; }
-        .tab-btn.active::after {
-            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 20px; height: 3px; background: #6366f1; border-radius: 10px; box-shadow: 0 0 10px #6366f1;
+        /* Styles des boutons onglets */
+        .tab-btn {
+            text-align: left; padding: 12px 16px; border-radius: 12px;
+            transition: all 0.3s ease; opacity: 0.6; font-weight: 600; letter-spacing: 0.05em; font-size: 0.75rem; text-transform: uppercase;
+            display: flex; align-items: center; gap: 10px;
         }
+        .tab-btn:hover { opacity: 1; background: rgba(255,255,255,0.03); }
+
+        /* Couleurs actives dynamiques gérées en JS, mais base active ici */
+        .tab-btn.active { opacity: 1; background: rgba(255,255,255,0.08); }
 
         .hidden-section { display: none; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
 
         .toggle-checkbox:checked { right: 0; border-color: #6366f1; }
         .toggle-checkbox:checked + .toggle-label { background-color: #6366f1; }
@@ -51,12 +59,12 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 bg-black bg-gradient-custom">
 
-    <div id="app-container" class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div id="app-container" class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6">
 
         <div class="lg:col-span-12 flex items-center justify-between mb-2">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 relative flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/20">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <div>
                     <h1 class="text-lg font-bold tracking-wide">MY FINANCE</h1>
@@ -69,145 +77,163 @@
             </button>
         </div>
 
-        <div class="lg:col-span-4 glass rounded-[32px] p-6 lg:p-8 h-fit flex flex-col">
+        <div class="lg:col-span-5 glass-panel flex flex-col lg:flex-row h-fit">
 
-            <div class="flex items-center gap-6 overflow-x-auto scrollbar-hide mb-8 border-b border-white/10 pb-1">
-                <button onclick="switchTab('epargne')" id="tab-epargne" class="tab-btn active text-sm font-semibold tracking-wide">ÉPARGNE</button>
-                <button onclick="switchTab('objectif')" id="tab-objectif" class="tab-btn text-sm font-semibold tracking-wide">OBJECTIF</button>
-                <button onclick="switchTab('immo')" id="tab-immo" class="tab-btn text-sm font-semibold tracking-wide">CRÉDIT</button>
-                <button onclick="switchTab('rentbuy')" id="tab-rentbuy" class="tab-btn text-sm font-semibold tracking-wide">LOUER/ACHETER</button>
-                <button onclick="switchTab('capacite')" id="tab-capacite" class="tab-btn text-sm font-semibold tracking-wide">CAPACITÉ</button>
+            <div class="lg:w-1/3 nav-sidebar p-3 flex flex-row lg:flex-col gap-1 overflow-x-auto scrollbar-hide">
+                <button onclick="switchTab('epargne')" id="tab-epargne" class="tab-btn active text-indigo-400">
+                    <span>💎</span> Épargne
+                </button>
+                <button onclick="switchTab('objectif')" id="tab-objectif" class="tab-btn text-amber-500">
+                    <span>🎯</span> Objectif
+                </button>
+                <button onclick="switchTab('immo')" id="tab-immo" class="tab-btn text-pink-500">
+                    <span>🏠</span> Crédit
+                </button>
+                <button onclick="switchTab('rentbuy')" id="tab-rentbuy" class="tab-btn text-cyan-400">
+                    <span>⚖️</span> Louer/Acheter
+                </button>
+                <button onclick="switchTab('capacite')" id="tab-capacite" class="tab-btn text-emerald-400">
+                    <span>🚀</span> Capacité
+                </button>
             </div>
 
-            <div id="form-epargne" class="space-y-5">
-                <div>
-                    <label class="text-[11px] font-bold text-indigo-400 uppercase tracking-wider ml-1">Capital de départ</label>
-                    <input type="number" inputmode="decimal" id="capital" placeholder="Ex: 1000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-indigo-400 uppercase tracking-wider ml-1">Ajout mensuel</label>
-                    <input type="number" inputmode="decimal" id="mensuel" placeholder="Ex: 200" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Taux (%)</label>
-                        <input type="number" inputmode="decimal" id="taux" placeholder="5" step="0.1" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
-                    </div>
-                    <div>
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Années</label>
-                        <input type="number" inputmode="decimal" id="duree" placeholder="15" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
-                    </div>
-                </div>
-                <div class="flex items-center justify-between bg-[#16161a] p-3 rounded-xl border border-white/5">
-                    <span class="text-xs font-medium text-gray-400">Ajuster à l'inflation (-2%)</span>
-                    <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                        <input type="checkbox" name="toggle" id="inflation-check" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 ease-in-out" style="top: 2px; left: 2px;"/>
-                        <label for="inflation-check" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer"></label>
-                    </div>
-                </div>
-                <button onclick="calculerEpargne()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-indigo-600 hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20">Simuler</button>
-            </div>
+            <div class="lg:w-2/3 p-6 lg:p-8 bg-black/20">
 
-            <div id="form-objectif" class="space-y-5 hidden-section">
-                <div>
-                    <label class="text-[11px] font-bold text-amber-500 uppercase tracking-wider ml-1">Somme Ciblée (Le Rêve)</label>
-                    <input type="number" inputmode="decimal" id="obj-montant" placeholder="Ex: 50000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 border-amber-500/30 focus:border-amber-500">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div id="form-epargne" class="space-y-5">
+                    <h2 class="text-xl font-bold text-indigo-400 mb-4">Simulation Épargne</h2>
                     <div>
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Dans (Ans)</label>
-                        <input type="number" inputmode="decimal" id="obj-duree" placeholder="10" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Capital de départ</label>
+                        <input type="number" inputmode="decimal" id="capital" placeholder="Ex: 1000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Mise Mensuelle (€)</label>
-                        <input type="number" inputmode="decimal" id="obj-mensuel" placeholder="Ex: 200" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Ajout mensuel</label>
+                        <input type="number" inputmode="decimal" id="mensuel" placeholder="Ex: 200" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
                     </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Taux (%)</label>
+                            <input type="number" inputmode="decimal" id="taux" placeholder="5" step="0.1" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Années</label>
+                            <input type="number" inputmode="decimal" id="duree" placeholder="15" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between bg-[#16161a] p-3 rounded-xl border border-white/5">
+                        <span class="text-xs font-medium text-gray-400">Ajuster à l'inflation (-2%)</span>
+                        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="toggle" id="inflation-check" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 ease-in-out" style="top: 2px; left: 2px;"/>
+                            <label for="inflation-check" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer"></label>
+                        </div>
+                    </div>
+                    <button onclick="calculerEpargne()" class="w-full py-3 rounded-xl font-bold text-white mt-2 bg-indigo-600 hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20">Calculer</button>
                 </div>
-                <div class="bg-[#16161a] p-4 rounded-xl border border-white/5">
-                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Capital de départ (Optionnel)</label>
-                    <input type="number" inputmode="decimal" id="obj-depart" placeholder="Ex: 1000" class="input-field w-full rounded-xl px-4 py-2 text-sm mt-2">
-                </div>
-                <button onclick="calculerObjectif()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-amber-600 hover:bg-amber-500 transition shadow-lg shadow-amber-500/20">Trouver le Taux Requis</button>
-            </div>
 
-            <div id="form-immo" class="space-y-5 hidden-section">
-                <div>
-                    <label class="text-[11px] font-bold text-pink-500 uppercase tracking-wider ml-1">Prix du bien</label>
-                    <input type="number" inputmode="decimal" id="immo-montant" placeholder="Ex: 250000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
-                </div>
-                <div class="flex items-center justify-between px-1">
-                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Inclure Frais de Notaire (~7.5%)</label>
-                    <input type="checkbox" id="notaire-check" class="w-5 h-5 accent-pink-500 rounded cursor-pointer">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
+                <div id="form-objectif" class="space-y-5 hidden-section">
+                    <h2 class="text-xl font-bold text-amber-500 mb-4">Objectif Millionnaire</h2>
                     <div>
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Taux (%)</label>
-                        <input type="number" inputmode="decimal" id="immo-taux" placeholder="3.8" step="0.1" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Somme Ciblée</label>
+                        <input type="number" inputmode="decimal" id="obj-montant" placeholder="Ex: 50000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 border-amber-500/30 focus:border-amber-500">
                     </div>
-                    <div>
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Années</label>
-                        <input type="number" inputmode="decimal" id="immo-duree" placeholder="25" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Dans (Ans)</label>
+                            <input type="number" inputmode="decimal" id="obj-duree" placeholder="10" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Mise/Mois</label>
+                            <input type="number" inputmode="decimal" id="obj-mensuel" placeholder="Ex: 200" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
                     </div>
+                    <div class="bg-[#16161a] p-3 rounded-xl border border-white/5">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Départ (Optionnel)</label>
+                        <input type="number" inputmode="decimal" id="obj-depart" placeholder="Ex: 1000" class="input-field w-full rounded-lg px-3 py-2 text-sm mt-1">
+                    </div>
+                    <button onclick="calculerObjectif()" class="w-full py-3 rounded-xl font-bold text-white mt-2 bg-amber-600 hover:bg-amber-500 transition shadow-lg shadow-amber-500/20">Trouver le Taux</button>
                 </div>
-                <button onclick="calculerImmo()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-pink-600 hover:bg-pink-500 transition shadow-lg shadow-pink-500/20">Calculer Mensualité</button>
-            </div>
 
-            <div id="form-rentbuy" class="space-y-5 hidden-section">
-                <div class="grid grid-cols-2 gap-4">
+                <div id="form-immo" class="space-y-5 hidden-section">
+                    <h2 class="text-xl font-bold text-pink-500 mb-4">Crédit Immobilier</h2>
                     <div>
-                        <label class="text-[11px] font-bold text-cyan-500 uppercase tracking-wider ml-1">Loyer Actuel</label>
-                        <input type="number" inputmode="decimal" id="rb-loyer" placeholder="800" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Prix du bien</label>
+                        <input type="number" inputmode="decimal" id="immo-montant" placeholder="Ex: 250000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
                     </div>
-                    <div>
-                        <label class="text-[11px] font-bold text-pink-500 uppercase tracking-wider ml-1">Prix Achat</label>
-                        <input type="number" inputmode="decimal" id="rb-prix" placeholder="200000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
+                    <div class="flex items-center justify-between px-1">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Inclure Notaire (~7.5%)</label>
+                        <input type="checkbox" id="notaire-check" class="w-5 h-5 accent-pink-500 rounded cursor-pointer">
                     </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Taux (%)</label>
+                            <input type="number" inputmode="decimal" id="immo-taux" placeholder="3.8" step="0.1" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Années</label>
+                            <input type="number" inputmode="decimal" id="immo-duree" placeholder="25" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
+                    </div>
+                    <button onclick="calculerImmo()" class="w-full py-3 rounded-xl font-bold text-white mt-2 bg-pink-600 hover:bg-pink-500 transition shadow-lg shadow-pink-500/20">Simuler</button>
                 </div>
-                <div>
-                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Apport Personnel</label>
-                    <input type="number" inputmode="decimal" id="rb-apport" placeholder="20000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
-                </div>
-                <button onclick="calculerRentBuy()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-gradient-to-r from-cyan-600 to-pink-600 hover:opacity-90 transition shadow-lg shadow-cyan-500/20">Comparer</button>
-                <p class="text-[10px] text-gray-500 text-center mt-2">Hypothèses : Taux 4%, Notaire 7.5%, Charges Proprio 1%/an</p>
-            </div>
 
-            <div id="form-capacite" class="space-y-5 hidden-section">
-                <div>
-                    <label class="text-[11px] font-bold text-emerald-500 uppercase tracking-wider ml-1">Revenus Net</label>
-                    <input type="number" inputmode="decimal" id="revenus" placeholder="Ex: 3000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
-                </div>
-                <div>
-                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Charges / Crédits</label>
-                    <input type="number" inputmode="decimal" id="charges" placeholder="Ex: 0" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Taux (%)</label>
-                        <input type="number" inputmode="decimal" id="cap-taux" placeholder="3.8" step="0.1" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                <div id="form-rentbuy" class="space-y-5 hidden-section">
+                    <h2 class="text-xl font-bold text-cyan-400 mb-4">Louer ou Acheter ?</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-cyan-500 uppercase tracking-wider ml-1">Loyer Actuel</label>
+                            <input type="number" inputmode="decimal" id="rb-loyer" placeholder="800" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-pink-500 uppercase tracking-wider ml-1">Prix Achat</label>
+                            <input type="number" inputmode="decimal" id="rb-prix" placeholder="200000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
+                        </div>
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Années</label>
-                        <input type="number" inputmode="decimal" id="cap-duree" placeholder="25" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Apport Personnel</label>
+                        <input type="number" inputmode="decimal" id="rb-apport" placeholder="20000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
                     </div>
+                    <button onclick="calculerRentBuy()" class="w-full py-3 rounded-xl font-bold text-white mt-2 bg-gradient-to-r from-cyan-600 to-pink-600 hover:opacity-90 transition shadow-lg shadow-cyan-500/20">Comparer</button>
                 </div>
-                <button onclick="calculerCapacite()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-emerald-600 hover:bg-emerald-500 transition shadow-lg shadow-emerald-500/20">Calculer Enveloppe</button>
+
+                <div id="form-capacite" class="space-y-5 hidden-section">
+                    <h2 class="text-xl font-bold text-emerald-400 mb-4">Ma Capacité d'Emprunt</h2>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Revenus Net</label>
+                        <input type="number" inputmode="decimal" id="revenus" placeholder="Ex: 3000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Charges / Crédits</label>
+                        <input type="number" inputmode="decimal" id="charges" placeholder="Ex: 0" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Taux (%)</label>
+                            <input type="number" inputmode="decimal" id="cap-taux" placeholder="3.8" step="0.1" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Années</label>
+                            <input type="number" inputmode="decimal" id="cap-duree" placeholder="25" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
+                    </div>
+                    <button onclick="calculerCapacite()" class="w-full py-3 rounded-xl font-bold text-white mt-2 bg-emerald-600 hover:bg-emerald-500 transition shadow-lg shadow-emerald-500/20">Calculer Enveloppe</button>
+                </div>
+
             </div>
         </div>
 
-        <div class="lg:col-span-8 flex flex-col gap-6">
+        <div class="lg:col-span-7 flex flex-col gap-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="glass rounded-[24px] p-6 relative overflow-hidden">
+                <div class="glass-panel p-6 relative overflow-hidden">
                     <div id="blob-1" class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-full blur-[60px] opacity-20 -mr-10 -mt-10"></div>
                     <p id="kpi-label-1" class="text-gray-400 text-xs font-bold tracking-widest uppercase">TOTAL</p>
                     <h2 id="kpi-val-1" class="text-4xl font-bold mt-2 tracking-tight">-- €</h2>
                 </div>
-                <div class="glass rounded-[24px] p-6 relative overflow-hidden">
+                <div class="glass-panel p-6 relative overflow-hidden">
                     <div id="blob-2" class="absolute top-0 right-0 w-32 h-32 bg-purple-500 rounded-full blur-[60px] opacity-20 -mr-10 -mt-10"></div>
                     <p id="kpi-label-2" class="text-indigo-400 text-xs font-bold tracking-widest uppercase">DÉTAILS</p>
                     <h2 id="kpi-val-2" class="text-4xl font-bold mt-2 tracking-tight text-indigo-400">-- €</h2>
                 </div>
             </div>
-            <div class="glass rounded-[32px] p-6 flex-1 min-h-[350px] relative">
+            <div class="glass-panel p-6 flex-1 min-h-[400px] relative">
                 <canvas id="financeChart"></canvas>
             </div>
         </div>
@@ -236,9 +262,9 @@
 
         // --- PDF OPTIMISÉ ---
         function downloadPDF() {
-            const element = document.getElementById('app-container'); // On ne capture que le conteneur
+            const element = document.getElementById('app-container');
             const opt = {
-                margin: [10, 10], // Marges
+                margin: [10, 10],
                 filename: 'ma-simulation-finance.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, backgroundColor: '#050505' },
@@ -250,10 +276,8 @@
         // --- NAVIGATION ---
         function switchTab(tab) {
             ['epargne', 'immo', 'capacite', 'objectif', 'rentbuy'].forEach(t => {
-                const form = document.getElementById('form-'+t);
-                const btn = document.getElementById('tab-'+t);
-                if(form) form.classList.add('hidden-section');
-                if(btn) btn.classList.remove('active');
+                document.getElementById('form-'+t).classList.add('hidden-section');
+                document.getElementById('tab-'+t).classList.remove('active');
             });
             document.getElementById('form-'+tab).classList.remove('hidden-section');
             document.getElementById('tab-'+tab).classList.add('active');
@@ -268,15 +292,20 @@
         function formatMoney(amount) {
             return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
         }
-        function updateKPI(l1, v1, l2, v2, colorClass) {
+        function updateKPI(l1, v1, l2, v2, colorClass, blobColor) {
             document.getElementById('kpi-label-1').innerText = l1;
             document.getElementById('kpi-val-1').innerText = typeof v1 === 'number' ? formatMoney(v1) : v1;
             document.getElementById('kpi-label-2').innerText = l2;
             document.getElementById('kpi-val-2').innerText = typeof v2 === 'number' ? formatMoney(v2) : v2;
             document.getElementById('kpi-val-2').className = "text-4xl font-bold mt-2 tracking-tight " + colorClass;
+
+            // Blob Color Change (Visual Feedback)
+            const blobClass = `absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-20 -mr-10 -mt-10 ${blobColor}`;
+            document.getElementById('blob-1').className = blobClass;
+            document.getElementById('blob-2').className = blobClass;
         }
 
-        // --- 1. ÉPARGNE (Tooltip Réparé) ---
+        // --- 1. ÉPARGNE ---
         function calculerEpargne() {
             const capital = parseFloat(document.getElementById('capital').value);
             const mensuel = parseFloat(document.getElementById('mensuel').value);
@@ -297,11 +326,11 @@
                 labels.push("Année " + i); dataInv.push(totalVerse); dataInt.push(totalReel - totalVerse);
             }
             let total = dataInv[duree] + dataInt[duree];
-            updateKPI(inflation ? "TOTAL (Ajusté Inflation)" : "PATRIMOINE TOTAL", total, "GAINS BRUTS", dataInt[duree], "text-indigo-400");
+            updateKPI(inflation ? "TOTAL (Ajusté Inflation)" : "PATRIMOINE TOTAL", total, "GAINS BRUTS", dataInt[duree], "text-indigo-400", "bg-indigo-500");
             drawChart(labels, dataInv, dataInt, "Capital Investi", "Intérêts", '#6366f1', '#a5b4fc');
         }
 
-        // --- 2. OBJECTIF (Logique Inversée : Trouver le Taux) ---
+        // --- 2. OBJECTIF ---
         function calculerObjectif() {
             const cible = parseFloat(document.getElementById('obj-montant').value);
             const duree = parseFloat(document.getElementById('obj-duree').value);
@@ -310,31 +339,23 @@
 
             if(isNaN(cible) || isNaN(duree)) return;
 
-            // Algorithme de recherche dichotomique pour trouver le taux
             let minRate = 0; let maxRate = 100; let foundRate = 0;
-
-            // Si on met juste l'argent sous le matelas, ça fait combien ?
             let totalSansInteret = depart + (mensuel * duree * 12);
 
             if(totalSansInteret >= cible) {
                 foundRate = 0;
             } else {
-                // On cherche le taux pendant 100 itérations (très précis)
                 for(let k=0; k<100; k++) {
                     let guess = (minRate + maxRate) / 2;
                     let tm = guess / 100 / 12;
                     let nbMois = duree * 12;
                     let fv = (depart * Math.pow(1+tm, nbMois)) + (mensuel * ((Math.pow(1+tm, nbMois)-1)/tm));
-
-                    if(fv < cible) minRate = guess;
-                    else maxRate = guess;
+                    if(fv < cible) minRate = guess; else maxRate = guess;
                 }
                 foundRate = maxRate;
             }
 
-            updateKPI("OBJECTIF", cible, "TAUX NÉCESSAIRE", foundRate.toFixed(2) + " %", "text-amber-500");
-
-            // Graphique projection
+            updateKPI("OBJECTIF", cible, "TAUX NÉCESSAIRE", foundRate.toFixed(2) + " %", "text-amber-500", "bg-amber-500");
             const labels = []; const dataCapital = []; const dataInterets = [];
             for(let i=0; i<=duree; i++) {
                 let tm = foundRate / 100 / 12;
@@ -355,7 +376,6 @@
 
             const duree = 25; const tauxImmo = 0.04; const tauxEpargne = 0.03; const appImmo = 0.01;
             const fraisNotaire = prix * 0.075; const chargesProprio = prix * 0.01;
-
             const emprunt = prix + fraisNotaire - apport;
             const tm = tauxImmo / 12; const nbMois = duree * 12;
             const mensualite = emprunt * (tm * Math.pow(1+tm, nbMois)) / (Math.pow(1+tm, nbMois)-1);
@@ -377,7 +397,7 @@
             }
             let breakEven = "Jamais";
             for(let i=1; i<wealthOwner.length; i++) if(wealthOwner[i] > wealthRenter[i]) { breakEven = i + " ans"; break; }
-            updateKPI("RENTABLE À PARTIR DE", breakEven, "PATRIMOINE À 25 ANS", wealthOwner[25], "text-cyan-400");
+            updateKPI("RENTABLE À PARTIR DE", breakEven, "PATRIMOINE À 25 ANS", wealthOwner[25], "text-cyan-400", "bg-cyan-500");
 
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
@@ -388,6 +408,7 @@
             });
         }
 
+        // --- 4. CRÉDIT ---
         function calculerImmo() {
             let montant = parseFloat(document.getElementById('immo-montant').value);
             const taux = parseFloat(document.getElementById('immo-taux').value) / 100;
@@ -405,10 +426,11 @@
                 if (m < nbMois) { let intM = solde * tm; let capM = mensualite - intM; solde -= capM; cumulInt += intM; cumulCap += capM; }
             }
             let detailVal = withNotaire ? cumulInt + fraisNotaire : cumulInt;
-            updateKPI("MENSUALITÉ", mensualite, "COÛT CRÉDIT + FRAIS", detailVal, "text-pink-500");
+            updateKPI("MENSUALITÉ", mensualite, "COÛT CRÉDIT + FRAIS", detailVal, "text-pink-500", "bg-pink-500");
             drawChart(labels, dataCap, dataInt, "Capital Remboursé", "Coût Banque", '#db2777', '#f472b6');
         }
 
+        // --- 5. CAPACITÉ ---
         function calculerCapacite() {
             const revenus = parseFloat(document.getElementById('revenus').value);
             const charges = parseFloat(document.getElementById('charges').value) || 0;
@@ -420,7 +442,7 @@
             const nbMois = duree * 12; const tm = taux / 12;
             let capitalMax = taux > 0 ? mensualiteMax * (1 - Math.pow(1 + tm, -nbMois)) / tm : mensualiteMax * nbMois;
             const coutTotal = (mensualiteMax * nbMois) - capitalMax;
-            updateKPI("ENVELOPPE MAX", capitalMax, "MENSUALITÉ MAX (35%)", mensualiteMax, "text-emerald-400");
+            updateKPI("ENVELOPPE MAX", capitalMax, "MENSUALITÉ MAX (35%)", mensualiteMax, "text-emerald-400", "bg-emerald-500");
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
             myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Capital', 'Coût'], datasets: [{ data: [capitalMax, coutTotal], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: 'white', padding: 20 } } }, cutout: '70%' } });
@@ -435,11 +457,8 @@
                 data: { labels: labels, datasets: [{ label: l2, data: d2, borderColor: c2, backgroundColor: c2 + '40', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 }, { label: l1, data: d1, borderColor: c1, backgroundColor: grad1, borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false }, // ACTIVATION DU CURSEUR UNIFIÉ
-                    plugins: {
-                        legend: { labels: { color: 'white', font: { family: 'Outfit' } } },
-                        tooltip: { mode: 'index', intersect: false } // ACTIVATION DU TOOLTIP SUR TOUTE LA LIGNE
-                    },
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { labels: { color: 'white', font: { family: 'Outfit' } } }, tooltip: { mode: 'index', intersect: false } },
                     scales: { x: { grid: { display: false }, ticks: { color: '#52525b' } }, y: { grid: { color: '#27272a' }, ticks: { color: '#52525b' }, stacked: true } }
                 }
             });
