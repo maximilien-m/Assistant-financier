@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- DESIGN SYSTEM V5 --- */
+        /* --- DESIGN SYSTEM V6 --- */
         body { font-family: 'Outfit', sans-serif; background-color: #050505; color: white; -webkit-tap-highlight-color: transparent; }
 
         .bg-gradient-custom {
@@ -33,7 +33,6 @@
         }
         ::placeholder { color: #4b5563; opacity: 1; }
 
-        /* Scrollbar cachée pour le menu des onglets */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -46,7 +45,6 @@
 
         .hidden-section { display: none; }
 
-        /* Toggle Switch pour l'inflation */
         .toggle-checkbox:checked { right: 0; border-color: #6366f1; }
         .toggle-checkbox:checked + .toggle-label { background-color: #6366f1; }
     </style>
@@ -65,9 +63,9 @@
                     <p class="text-[10px] text-gray-500 uppercase tracking-[0.2em]">Assistant Personnel</p>
                 </div>
             </div>
-            <button onclick="downloadPDF()" class="flex items-center gap-2 bg-[#1c1c21] hover:bg-[#25252b] border border-white/10 text-xs font-bold px-4 py-2 rounded-lg transition">
-                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                <span class="hidden sm:inline text-gray-400">PDF</span>
+            <button onclick="downloadPDF()" class="flex items-center gap-2 bg-[#1c1c21] hover:bg-[#25252b] border border-white/10 text-xs font-bold px-4 py-2 rounded-lg transition group">
+                <svg class="w-4 h-4 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <span class="hidden sm:inline text-gray-400 group-hover:text-white">PDF</span>
             </button>
         </div>
 
@@ -100,7 +98,6 @@
                         <input type="number" inputmode="decimal" id="duree" placeholder="15" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
                     </div>
                 </div>
-
                 <div class="flex items-center justify-between bg-[#16161a] p-3 rounded-xl border border-white/5">
                     <span class="text-xs font-medium text-gray-400">Ajuster à l'inflation (-2%)</span>
                     <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
@@ -108,7 +105,6 @@
                         <label for="inflation-check" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer"></label>
                     </div>
                 </div>
-
                 <button onclick="calculerEpargne()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-indigo-600 hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20">Simuler</button>
             </div>
 
@@ -123,15 +119,15 @@
                         <input type="number" inputmode="decimal" id="obj-duree" placeholder="10" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
                     </div>
                     <div>
-                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Taux (%)</label>
-                        <input type="number" inputmode="decimal" id="obj-taux" placeholder="5" step="0.1" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Mise Mensuelle (€)</label>
+                        <input type="number" inputmode="decimal" id="obj-mensuel" placeholder="Ex: 200" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
                     </div>
                 </div>
                 <div class="bg-[#16161a] p-4 rounded-xl border border-white/5">
                     <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Capital de départ (Optionnel)</label>
                     <input type="number" inputmode="decimal" id="obj-depart" placeholder="Ex: 1000" class="input-field w-full rounded-xl px-4 py-2 text-sm mt-2">
                 </div>
-                <button onclick="calculerObjectif()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-amber-600 hover:bg-amber-500 transition shadow-lg shadow-amber-500/20">Calculer l'effort</button>
+                <button onclick="calculerObjectif()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-amber-600 hover:bg-amber-500 transition shadow-lg shadow-amber-500/20">Trouver le Taux Requis</button>
             </div>
 
             <div id="form-immo" class="space-y-5 hidden-section">
@@ -238,10 +234,16 @@
         }
         document.addEventListener('input', saveInputs);
 
-        // --- PDF ---
+        // --- PDF OPTIMISÉ ---
         function downloadPDF() {
-            const element = document.body;
-            const opt = { margin:0, filename:'mon-plan-finance.pdf', image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2, backgroundColor:'#050505'}, jsPDF:{unit:'in', format:'a4', orientation:'landscape'} };
+            const element = document.getElementById('app-container'); // On ne capture que le conteneur
+            const opt = {
+                margin: [10, 10], // Marges
+                filename: 'ma-simulation-finance.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, backgroundColor: '#050505' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
             html2pdf().set(opt).from(element).save();
         }
 
@@ -268,13 +270,13 @@
         }
         function updateKPI(l1, v1, l2, v2, colorClass) {
             document.getElementById('kpi-label-1').innerText = l1;
-            document.getElementById('kpi-val-1').innerText = formatMoney(v1);
+            document.getElementById('kpi-val-1').innerText = typeof v1 === 'number' ? formatMoney(v1) : v1;
             document.getElementById('kpi-label-2').innerText = l2;
             document.getElementById('kpi-val-2').innerText = typeof v2 === 'number' ? formatMoney(v2) : v2;
             document.getElementById('kpi-val-2').className = "text-4xl font-bold mt-2 tracking-tight " + colorClass;
         }
 
-        // --- 1. ÉPARGNE (Inflation Ready) ---
+        // --- 1. ÉPARGNE (Tooltip Réparé) ---
         function calculerEpargne() {
             const capital = parseFloat(document.getElementById('capital').value);
             const mensuel = parseFloat(document.getElementById('mensuel').value);
@@ -283,8 +285,6 @@
             const inflation = document.getElementById('inflation-check').checked;
 
             if(isNaN(capital) || isNaN(duree)) return;
-
-            // Si inflation activée, on réduit le rendement réel de 2%
             if(inflation) taux = taux - 2;
 
             const labels = []; const dataInv = []; const dataInt = [];
@@ -294,53 +294,56 @@
                 let totalReel = (taux !== 0)
                     ? (capital * Math.pow(1 + taux/100/12, mois)) + (mensuel * ((Math.pow(1 + taux/100/12, mois) - 1) / (taux/100/12)))
                     : totalVerse;
-
                 labels.push("Année " + i); dataInv.push(totalVerse); dataInt.push(totalReel - totalVerse);
             }
             let total = dataInv[duree] + dataInt[duree];
-            let labelKPI = inflation ? "TOTAL (Ajusté Inflation)" : "PATRIMOINE TOTAL";
-            updateKPI(labelKPI, total, "GAINS BRUTS", dataInt[duree], "text-indigo-400");
+            updateKPI(inflation ? "TOTAL (Ajusté Inflation)" : "PATRIMOINE TOTAL", total, "GAINS BRUTS", dataInt[duree], "text-indigo-400");
             drawChart(labels, dataInv, dataInt, "Capital Investi", "Intérêts", '#6366f1', '#a5b4fc');
         }
 
-        // --- 2. OBJECTIF MILLIONNAIRE ---
+        // --- 2. OBJECTIF (Logique Inversée : Trouver le Taux) ---
         function calculerObjectif() {
             const cible = parseFloat(document.getElementById('obj-montant').value);
             const duree = parseFloat(document.getElementById('obj-duree').value);
-            const taux = parseFloat(document.getElementById('obj-taux').value) / 100;
+            const mensuel = parseFloat(document.getElementById('obj-mensuel').value) || 0;
             const depart = parseFloat(document.getElementById('obj-depart').value) || 0;
 
-            if(isNaN(cible) || isNaN(duree) || isNaN(taux)) return;
+            if(isNaN(cible) || isNaN(duree)) return;
 
-            const nbMois = duree * 12;
-            const tm = taux / 12;
+            // Algorithme de recherche dichotomique pour trouver le taux
+            let minRate = 0; let maxRate = 100; let foundRate = 0;
 
-            // Formule V = C(1+r)^n + M * ... => on cherche M (Mensualité)
-            // ValeurFutureDepart = depart * (1+tm)^nbMois
-            // ResteAProduire = Cible - ValeurFutureDepart
-            // M = Reste * tm / ((1+tm)^nbMois - 1)
+            // Si on met juste l'argent sous le matelas, ça fait combien ?
+            let totalSansInteret = depart + (mensuel * duree * 12);
 
-            let valFutureDepart = depart * Math.pow(1 + tm, nbMois);
-            let reste = cible - valFutureDepart;
-            let effortMensuel = 0;
+            if(totalSansInteret >= cible) {
+                foundRate = 0;
+            } else {
+                // On cherche le taux pendant 100 itérations (très précis)
+                for(let k=0; k<100; k++) {
+                    let guess = (minRate + maxRate) / 2;
+                    let tm = guess / 100 / 12;
+                    let nbMois = duree * 12;
+                    let fv = (depart * Math.pow(1+tm, nbMois)) + (mensuel * ((Math.pow(1+tm, nbMois)-1)/tm));
 
-            if (reste > 0) {
-                effortMensuel = (reste * tm) / (Math.pow(1 + tm, nbMois) - 1);
+                    if(fv < cible) minRate = guess;
+                    else maxRate = guess;
+                }
+                foundRate = maxRate;
             }
 
-            updateKPI("CIBLE À ATTEINDRE", cible, "EFFORT MENSUEL REQUIS", effortMensuel, "text-amber-500");
+            updateKPI("OBJECTIF", cible, "TAUX NÉCESSAIRE", foundRate.toFixed(2) + " %", "text-amber-500");
 
-            // Graphique de projection
+            // Graphique projection
             const labels = []; const dataCapital = []; const dataInterets = [];
             for(let i=0; i<=duree; i++) {
+                let tm = foundRate / 100 / 12;
                 let mois = i*12;
-                let epargneCumulee = (effortMensuel * mois) + depart;
-                let totalReel = (depart * Math.pow(1+tm, mois)) + (effortMensuel * ((Math.pow(1+tm, mois)-1)/tm));
-                labels.push("Année "+i);
-                dataCapital.push(epargneCumulee);
-                dataInterets.push(totalReel - epargneCumulee);
+                let cap = depart + (mensuel * mois);
+                let total = foundRate > 0 ? (depart * Math.pow(1+tm, mois)) + (mensuel * ((Math.pow(1+tm, mois)-1)/tm)) : cap;
+                labels.push("Année "+i); dataCapital.push(cap); dataInterets.push(total - cap);
             }
-            drawChart(labels, dataCapital, dataInterets, "Votre Effort", "Intérêts Magiques", '#d97706', '#fcd34d');
+            drawChart(labels, dataCapital, dataInterets, "Vos Versements", "Intérêts Requis", '#d97706', '#fcd34d');
         }
 
         // --- 3. LOUER vs ACHETER ---
@@ -348,85 +351,44 @@
             const loyer = parseFloat(document.getElementById('rb-loyer').value);
             const prix = parseFloat(document.getElementById('rb-prix').value);
             const apport = parseFloat(document.getElementById('rb-apport').value) || 0;
-
             if(isNaN(loyer) || isNaN(prix)) return;
 
-            // Hypothèses fixes pour simplifier
-            const duree = 25;
-            const tauxImmo = 0.04;
-            const tauxEpargne = 0.03;
-            const appreciationImmo = 0.01;
-            const fraisNotaire = prix * 0.075;
-            const chargesProprio = prix * 0.01; // Taxe fonciere + entretien / an
+            const duree = 25; const tauxImmo = 0.04; const tauxEpargne = 0.03; const appImmo = 0.01;
+            const fraisNotaire = prix * 0.075; const chargesProprio = prix * 0.01;
+
+            const emprunt = prix + fraisNotaire - apport;
+            const tm = tauxImmo / 12; const nbMois = duree * 12;
+            const mensualite = emprunt * (tm * Math.pow(1+tm, nbMois)) / (Math.pow(1+tm, nbMois)-1);
+            const epargneMensuelleLocataire = (mensualite + chargesProprio/12) - loyer;
 
             const labels = []; const wealthRenter = []; const wealthOwner = [];
-
-            // Scénario LOCATAIRE : Il place son apport + la différence (si Mensualité > Loyer)
-            // Scénario PROPRIO : Il paie son crédit, mais gagne la valeur de la maison
-
-            // Calcul mensualité crédit pour le proprio
-            const emprunt = prix + fraisNotaire - apport;
-            const tm = tauxImmo / 12;
-            const nbMois = duree * 12;
-            const mensualite = emprunt * (tm * Math.pow(1+tm, nbMois)) / (Math.pow(1+tm, nbMois)-1);
-
-            // Capacité d'épargne du locataire = (Mensualité + ChargesProprio/12) - Loyer
-            // On considère que l'effort financier est le même.
-            const chargesMensuellesProprio = chargesProprio / 12;
-            const budgetTotal = mensualite + chargesMensuellesProprio;
-            const epargneMensuelleLocataire = budgetTotal - loyer;
-
-            let capitalLocataire = apport;
-            let valeurMaison = prix;
-            let detteRestante = emprunt;
+            let capitalLocataire = apport; let valeurMaison = prix; let detteRestante = emprunt;
 
             for(let an=0; an<=duree; an++) {
                 labels.push("Année "+an);
-
-                // Locataire
-                // Son capital grandit avec intérêts composés + épargne mensuelle
-                // VF = C(1+r)^n + Pmt... (simplifié annuel)
                 if(an > 0) {
                     capitalLocataire = (capitalLocataire + (epargneMensuelleLocataire * 12)) * (1 + tauxEpargne);
-                    valeurMaison = valeurMaison * (1 + appreciationImmo);
-
-                    // Amortissement dette (approx)
-                    let partInteretAn = detteRestante * tauxImmo;
-                    let partCapitalAn = (mensualite * 12) - partInteretAn;
-                    detteRestante -= partCapitalAn;
-                    if(detteRestante < 0) detteRestante = 0;
+                    valeurMaison = valeurMaison * (1 + appImmo);
+                    let partInt = detteRestante * tauxImmo;
+                    let partCap = (mensualite * 12) - partInt;
+                    detteRestante -= partCap;
                 }
-
-                wealthRenter.push(capitalLocataire);
-                wealthOwner.push(valeurMaison - detteRestante);
+                wealthRenter.push(capitalLocataire); wealthOwner.push(valeurMaison - detteRestante);
             }
+            let breakEven = "Jamais";
+            for(let i=1; i<wealthOwner.length; i++) if(wealthOwner[i] > wealthRenter[i]) { breakEven = i + " ans"; break; }
+            updateKPI("RENTABLE À PARTIR DE", breakEven, "PATRIMOINE À 25 ANS", wealthOwner[25], "text-cyan-400");
 
-            // Trouver le point de croisement
-            let breakEvenYear = "Jamais";
-            for(let i=1; i<wealthOwner.length; i++) {
-                if(wealthOwner[i] > wealthRenter[i]) { breakEvenYear = i + " ans"; break; }
-            }
-
-            updateKPI("RENTABLE À PARTIR DE", breakEvenYear, "PATRIMOINE À 25 ANS", wealthOwner[25], "text-cyan-400");
-
-            // Graphique comparatif (Lignes)
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
             myChart = new Chart(ctx, {
                 type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Patrimoine PROPRIO', data: wealthOwner, borderColor: '#ec4899', borderWidth: 3, fill:false, tension:0.4 },
-                        { label: 'Patrimoine LOCATAIRE', data: wealthRenter, borderColor: '#06b6d4', borderWidth: 3, fill:false, tension:0.4 }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: 'white' } } }, scales: { x: { grid: { display: false }, ticks: { color: '#52525b' } }, y: { grid: { color: '#27272a' }, ticks: { color: '#52525b' } } } }
+                data: { labels: labels, datasets: [{ label: 'Patrimoine PROPRIO', data: wealthOwner, borderColor: '#ec4899', borderWidth: 3, fill:false }, { label: 'Patrimoine LOCATAIRE', data: wealthRenter, borderColor: '#06b6d4', borderWidth: 3, fill:false }] },
+                options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { color: 'white' } }, tooltip: { mode: 'index', intersect: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#52525b' } }, y: { grid: { color: '#27272a' }, ticks: { color: '#52525b' } } } }
             });
         }
 
         function calculerImmo() {
-            // ... (Code identique V4)
             let montant = parseFloat(document.getElementById('immo-montant').value);
             const taux = parseFloat(document.getElementById('immo-taux').value) / 100;
             const duree = parseInt(document.getElementById('immo-duree').value);
@@ -448,7 +410,6 @@
         }
 
         function calculerCapacite() {
-            // ... (Code identique V4)
             const revenus = parseFloat(document.getElementById('revenus').value);
             const charges = parseFloat(document.getElementById('charges').value) || 0;
             const taux = parseFloat(document.getElementById('cap-taux').value) / 100;
@@ -472,7 +433,15 @@
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: { labels: labels, datasets: [{ label: l2, data: d2, borderColor: c2, backgroundColor: c2 + '40', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 }, { label: l1, data: d1, borderColor: c1, backgroundColor: grad1, borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: 'white', font: { family: 'Outfit' } } } }, scales: { x: { grid: { display: false }, ticks: { color: '#52525b' } }, y: { grid: { color: '#27272a' }, ticks: { color: '#52525b' }, stacked: true } } }
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false }, // ACTIVATION DU CURSEUR UNIFIÉ
+                    plugins: {
+                        legend: { labels: { color: 'white', font: { family: 'Outfit' } } },
+                        tooltip: { mode: 'index', intersect: false } // ACTIVATION DU TOOLTIP SUR TOUTE LA LIGNE
+                    },
+                    scales: { x: { grid: { display: false }, ticks: { color: '#52525b' } }, y: { grid: { color: '#27272a' }, ticks: { color: '#52525b' }, stacked: true } }
+                }
             });
         }
 
