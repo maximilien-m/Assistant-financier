@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Finance - Ultimate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; }
+
+        .glass {
+            background: rgba(20, 20, 25, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .input-field {
+            background: #121214;
+            border: 1px solid #2c2c30;
+            color: white;
+            transition: all 0.2s;
+        }
+        .input-field:focus {
+            border-color: #6366f1;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Animation de transition des onglets */
+        .tab-btn { transition: all 0.3s; opacity: 0.6; }
+        .tab-btn.active { opacity: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); }
+
+        .hidden-section { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-black to-black">
+
+    <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <div class="lg:col-span-4 glass rounded-[30px] p-8 h-fit shadow-2xl flex flex-col">
+
+            <div class="flex bg-[#121214] p-1 rounded-xl mb-8 border border-[#2c2c30]">
+                <button onclick="switchTab('epargne')" id="tab-epargne" class="tab-btn active w-1/2 py-2 rounded-lg text-sm font-bold text-center">
+                    💎 ÉPARGNE
+                </button>
+                <button onclick="switchTab('immo')" id="tab-immo" class="tab-btn w-1/2 py-2 rounded-lg text-sm font-bold text-center">
+                    🏠 IMMOBILIER
+                </button>
+            </div>
+
+            <h1 id="main-title" class="text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+                Épargne
+            </h1>
+            <p id="sub-title" class="text-gray-400 text-sm mb-8 font-medium">Faites travailler votre argent.</p>
+
+            <div id="form-epargne" class="space-y-6">
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Capital de départ</label>
+                    <div class="relative mt-2">
+                        <span class="absolute left-4 top-3.5 text-gray-500">€</span>
+                        <input type="number" id="capital" value="1000" class="input-field w-full rounded-2xl pl-8 pr-4 py-3.5 text-lg font-semibold">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Versement mensuel</label>
+                    <div class="relative mt-2">
+                        <span class="absolute left-4 top-3.5 text-gray-500">€</span>
+                        <input type="number" id="mensuel" value="200" class="input-field w-full rounded-2xl pl-8 pr-4 py-3.5 text-lg font-semibold">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Taux (%)</label>
+                        <input type="number" id="taux" value="5" step="0.1" class="input-field w-full mt-2 rounded-2xl px-4 py-3.5 text-lg font-semibold text-center">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Durée (Ans)</label>
+                        <input type="number" id="duree" value="15" class="input-field w-full mt-2 rounded-2xl px-4 py-3.5 text-lg font-semibold text-center">
+                    </div>
+                </div>
+                <button onclick="calculerEpargne()" class="w-full py-4 rounded-2xl font-bold text-white mt-6 text-lg bg-gradient-to-r from-blue-600 to-emerald-500 hover:opacity-90 transition shadow-lg shadow-blue-900/20">
+                    Calculer l'Épargne
+                </button>
+            </div>
+
+            <div id="form-immo" class="space-y-6 hidden-section">
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Montant du Prêt</label>
+                    <div class="relative mt-2">
+                        <span class="absolute left-4 top-3.5 text-gray-500">€</span>
+                        <input type="number" id="immo-montant" value="250000" class="input-field w-full rounded-2xl pl-8 pr-4 py-3.5 text-lg font-semibold">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Taux (%)</label>
+                        <input type="number" id="immo-taux" value="3.8" step="0.1" class="input-field w-full mt-2 rounded-2xl px-4 py-3.5 text-lg font-semibold text-center">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Durée (Ans)</label>
+                        <input type="number" id="immo-duree" value="25" class="input-field w-full mt-2 rounded-2xl px-4 py-3.5 text-lg font-semibold text-center">
+                    </div>
+                </div>
+                <button onclick="calculerImmo()" class="w-full py-4 rounded-2xl font-bold text-white mt-6 text-lg bg-gradient-to-r from-violet-600 to-fuchsia-500 hover:opacity-90 transition shadow-lg shadow-violet-900/20">
+                    Calculer le Crédit
+                </button>
+            </div>
+        </div>
+
+        <div class="lg:col-span-8 flex flex-col gap-6">
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass rounded-[24px] p-6 relative overflow-hidden group">
+                    <div id="blob-kpi-1" class="absolute top-0 right-0 w-40 h-40 bg-blue-500 rounded-full blur-[80px] opacity-20 -mr-10 -mt-10 transition-colors duration-500"></div>
+                    <p id="label-kpi-1" class="text-gray-400 text-sm font-medium tracking-wider">PATRIMOINE TOTAL</p>
+                    <h2 id="val-kpi-1" class="text-4xl font-bold mt-2 text-white tracking-tight">0 €</h2>
+                </div>
+
+                <div class="glass rounded-[24px] p-6 relative overflow-hidden group">
+                    <div id="blob-kpi-2" class="absolute top-0 right-0 w-40 h-40 bg-emerald-500 rounded-full blur-[80px] opacity-20 -mr-10 -mt-10 transition-colors duration-500"></div>
+                    <p id="label-kpi-2" class="text-emerald-400 text-sm font-medium tracking-wider">INTÉRÊTS GAGNÉS</p>
+                    <h2 id="val-kpi-2" class="text-4xl font-bold mt-2 text-emerald-400 tracking-tight">0 €</h2>
+                </div>
+            </div>
+
+            <div class="glass rounded-[30px] p-6 flex-1 relative shadow-2xl min-h-[400px]">
+                <canvas id="financeChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let myChart;
+        Chart.defaults.color = '#6b7280';
+        Chart.defaults.font.family = 'Inter';
+
+        // --- GESTION DES ONGLETS ---
+        function switchTab(tab) {
+            // Interface
+            if(tab === 'epargne') {
+                document.getElementById('form-epargne').classList.remove('hidden-section');
+                document.getElementById('form-immo').classList.add('hidden-section');
+                document.getElementById('tab-epargne').classList.add('active');
+                document.getElementById('tab-immo').classList.remove('active');
+
+                // Textes & Couleurs
+                document.getElementById('main-title').innerText = "Épargne";
+                document.getElementById('main-title').className = "text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400";
+                document.getElementById('sub-title').innerText = "Faites travailler votre argent.";
+
+                calculerEpargne();
+            } else {
+                document.getElementById('form-epargne').classList.add('hidden-section');
+                document.getElementById('form-immo').classList.remove('hidden-section');
+                document.getElementById('tab-epargne').classList.remove('active');
+                document.getElementById('tab-immo').classList.add('active');
+
+                // Textes & Couleurs
+                document.getElementById('main-title').innerText = "Crédit Immo";
+                document.getElementById('main-title').className = "text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400";
+                document.getElementById('sub-title').innerText = "Estimez le coût réel de votre emprunt.";
+
+                calculerImmo();
+            }
+        }
+
+        // --- MOTEUR ÉPARGNE ---
+        function calculerEpargne() {
+            const capital = parseFloat(document.getElementById('capital').value) || 0;
+            const mensuel = parseFloat(document.getElementById('mensuel').value) || 0;
+            const taux = parseFloat(document.getElementById('taux').value) / 100 || 0;
+            const duree = parseInt(document.getElementById('duree').value) || 0;
+
+            const labels = [];
+            const dataInvesti = [];
+            const dataInterets = [];
+            const tauxMensuel = taux / 12;
+
+            for (let annee = 0; annee <= duree; annee++) {
+                let mois = annee * 12;
+                let totalVerse = capital + (mensuel * mois);
+                let totalReel;
+
+                if (taux > 0) {
+                    totalReel = (capital * Math.pow(1 + tauxMensuel, mois)) + (mensuel * ((Math.pow(1 + tauxMensuel, mois) - 1) / tauxMensuel));
+                } else {
+                    totalReel = totalVerse;
+                }
+
+                labels.push("Année " + annee);
+                dataInvesti.push(totalVerse);
+                dataInterets.push(totalReel - totalVerse);
+            }
+
+            const totalFinal = dataInvesti[duree] + dataInterets[duree];
+            updateKPI("PATRIMOINE TOTAL", totalFinal, "INTÉRÊTS GAGNÉS", dataInterets[duree], "text-emerald-400", "bg-blue-500", "bg-emerald-500");
+
+            updateChart(labels, dataInvesti, dataInterets, "Votre Capital", "Gains (Intérêts)", [59, 130, 246], [16, 185, 129]);
+        }
+
+        // --- MOTEUR IMMOBILIER ---
+        function calculerImmo() {
+            const montant = parseFloat(document.getElementById('immo-montant').value) || 0;
+            const taux = parseFloat(document.getElementById('immo-taux').value) / 100 || 0;
+            const duree = parseInt(document.getElementById('immo-duree').value) || 0;
+
+            const labels = [];
+            const dataCapitalRembourse = [];
+            const dataInteretsPayes = [];
+
+            const nbMois = duree * 12;
+            const tauxMensuel = taux / 12;
+            let mensualite;
+
+            if (taux > 0) {
+                mensualite = montant * (tauxMensuel * Math.pow(1 + tauxMensuel, nbMois)) / (Math.pow(1 + tauxMensuel, nbMois) - 1);
+            } else {
+                mensualite = montant / nbMois;
+            }
+
+            let soldeRestant = montant;
+            let cumulInterets = 0;
+            let cumulCapital = 0;
+
+            // On calcule mois par mois mais on affiche année par année pour le graphique
+            for (let mois = 0; mois <= nbMois; mois++) {
+                if (mois % 12 === 0) {
+                    labels.push("Année " + (mois/12));
+                    dataCapitalRembourse.push(cumulCapital);
+                    dataInteretsPayes.push(cumulInterets);
+                }
+
+                if (mois < nbMois) {
+                    let interetMois = soldeRestant * tauxMensuel;
+                    let capitalMois = mensualite - interetMois;
+
+                    soldeRestant -= capitalMois;
+                    cumulInterets += interetMois;
+                    cumulCapital += capitalMois;
+                }
+            }
+
+            updateKPI("MENSUALITÉ", mensualite, "COÛT CRÉDIT (INTÉRÊTS)", cumulInterets, "text-fuchsia-400", "bg-violet-500", "bg-fuchsia-500");
+
+            // Pour l'immo, on change les couleurs (Violet / Rose)
+            updateChart(labels, dataCapitalRembourse, dataInteretsPayes, "Capital Remboursé", "Coût Banque (Intérêts)", [139, 92, 246], [236, 72, 153]);
+        }
+
+        // --- UTILITAIRES ---
+        function updateKPI(label1, val1, label2, val2, colorClass2, bg1, bg2) {
+            const fmt = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+
+            document.getElementById('label-kpi-1').innerText = label1;
+            document.getElementById('val-kpi-1').innerText = fmt.format(val1);
+
+            document.getElementById('label-kpi-2').innerText = label2;
+            document.getElementById('label-kpi-2').className = "text-sm font-medium tracking-wider " + colorClass2;
+            document.getElementById('val-kpi-2').innerText = fmt.format(val2);
+            document.getElementById('val-kpi-2').className = "text-4xl font-bold mt-2 tracking-tight " + colorClass2;
+
+            // Changement des couleurs de fond (blobs)
+            document.getElementById('blob-kpi-1').className = `absolute top-0 right-0 w-40 h-40 ${bg1} rounded-full blur-[80px] opacity-20 -mr-10 -mt-10 transition-colors duration-500`;
+            document.getElementById('blob-kpi-2').className = `absolute top-0 right-0 w-40 h-40 ${bg2} rounded-full blur-[80px] opacity-20 -mr-10 -mt-10 transition-colors duration-500`;
+        }
+
+        function updateChart(labels, dataset1, dataset2, label1, label2, rgb1, rgb2) {
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            // Création des dégradés dynamiques
+            let grad1 = ctx.createLinearGradient(0, 0, 0, 400);
+            grad1.addColorStop(0, `rgba(${rgb1[0]}, ${rgb1[1]}, ${rgb1[2]}, 0.5)`);
+            grad1.addColorStop(1, `rgba(${rgb1[0]}, ${rgb1[1]}, ${rgb1[2]}, 0)`);
+
+            let grad2 = ctx.createLinearGradient(0, 0, 0, 400);
+            grad2.addColorStop(0, `rgba(${rgb2[0]}, ${rgb2[1]}, ${rgb2[2]}, 0.5)`);
+            grad2.addColorStop(1, `rgba(${rgb2[0]}, ${rgb2[1]}, ${rgb2[2]}, 0)`);
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: label2, // Celle du haut (Intérêts)
+                            data: dataset2,
+                            borderColor: `rgb(${rgb2[0]}, ${rgb2[1]}, ${rgb2[2]})`,
+                            backgroundColor: grad2,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        },
+                        {
+                            label: label1, // Celle du bas (Capital)
+                            data: dataset1,
+                            borderColor: `rgb(${rgb1[0]}, ${rgb1[1]}, ${rgb1[2]})`,
+                            backgroundColor: grad1,
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { position: 'top', labels: { color: 'white', font: { size: 12, family: 'Inter' }, usePointStyle: true } },
+                        tooltip: {
+                            backgroundColor: 'rgba(20, 20, 25, 0.95)',
+                            titleColor: '#fff',
+                            bodyColor: '#ccc',
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1,
+                            padding: 14,
+                            boxPadding: 6,
+                            titleFont: { size: 14, weight: 'bold' },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#52525b', maxTicksLimit: 8 } },
+                        y: {
+                            grid: { color: '#27272a', borderDash: [5, 5] },
+                            ticks: { color: '#52525b' },
+                            stacked: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Lancement auto
+        calculerEpargne();
+    </script>
+</body>
+</html>
