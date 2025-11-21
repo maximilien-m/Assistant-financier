@@ -6,12 +6,18 @@
     <title>Assistant Personnel</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- DESIGN SYSTEM V8 (LISIBLE) --- */
+        /* ==========================================
+           DESIGN SYSTEM PERSONNALISÉ (CSS)
+        ========================================== */
+
         body {
             font-family: 'Outfit', sans-serif;
             background-color: #050505;
@@ -19,11 +25,13 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* Fond dégradé subtil (Bleu / Rose) */
         .bg-gradient-custom {
             background: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
                         radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
         }
 
+        /* Effet de verre (Glassmorphism) pour les panneaux */
         .glass-panel {
             background: rgba(22, 22, 26, 0.75);
             backdrop-filter: blur(30px);
@@ -34,7 +42,7 @@
             overflow: hidden;
         }
 
-        /* Design du Bandeau Cookie */
+        /* Design spécifique du bandeau Cookies */
         .cookie-glass {
             background: rgba(20, 20, 25, 0.95);
             backdrop-filter: blur(40px);
@@ -43,6 +51,7 @@
             box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
         }
 
+        /* Champs de saisie (Inputs) */
         .input-field {
             background: #0f0f11;
             border: 1px solid #2c2c30;
@@ -57,11 +66,13 @@
         }
         ::placeholder { color: #4b5563; opacity: 1; }
 
+        /* Barre latérale de navigation */
         .nav-sidebar {
             background: rgba(0,0,0,0.2);
             border-right: 1px solid rgba(255,255,255,0.05);
         }
 
+        /* Boutons des onglets */
         .tab-btn {
             text-align: left;
             padding: 12px 16px;
@@ -79,11 +90,14 @@
         .tab-btn:hover { opacity: 1; background: rgba(255,255,255,0.03); }
         .tab-btn.active { opacity: 1; background: rgba(255,255,255,0.08); }
 
+        /* Utilitaires pour cacher les éléments */
         .hidden-section { display: none; }
         .hidden-banner { display: none !important; }
+
+        /* Cacher la barre de défilement tout en permettant le scroll */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-        /* Switch Inflation */
+        /* Bouton Switch (Inflation) */
         .toggle-checkbox:checked { right: 0; border-color: #6366f1; }
         .toggle-checkbox:checked + .toggle-label { background-color: #6366f1; }
     </style>
@@ -102,6 +116,7 @@
                     <p class="text-[10px] text-gray-500 uppercase tracking-[0.2em]">Assistant Personnel</p>
                 </div>
             </div>
+
             <button onclick="downloadPDF()" class="flex items-center gap-2 bg-[#1c1c21] hover:bg-[#25252b] border border-white/10 text-xs font-bold px-4 py-2 rounded-lg transition group">
                 <svg class="w-4 h-4 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 <span class="hidden sm:inline text-gray-400 group-hover:text-white">PDF</span>
@@ -122,37 +137,76 @@
 
                 <div id="form-epargne" class="space-y-5">
                     <h2 class="text-xl font-bold text-indigo-400 mb-4">Simulation Épargne</h2>
-                    <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Capital de départ</label><input type="number" inputmode="decimal" id="capital" placeholder="Ex: 1000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1"></div>
-                    <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Ajout mensuel</label><input type="number" inputmode="decimal" id="mensuel" placeholder="Ex: 200" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1"></div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Capital de départ</label>
+                        <input type="number" inputmode="decimal" id="capital" placeholder="Ex: 1000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Ajout mensuel</label>
+                        <input type="number" inputmode="decimal" id="mensuel" placeholder="Ex: 200" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
+                    </div>
                     <div class="grid grid-cols-2 gap-3">
-                        <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Taux (%)</label><input type="number" inputmode="decimal" id="taux" placeholder="5" step="0.1" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center"></div>
-                        <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Années</label><input type="number" inputmode="decimal" id="duree" placeholder="15" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center"></div>
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Taux (%)</label>
+                            <input type="number" inputmode="decimal" id="taux" placeholder="5" step="0.1" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Années</label>
+                            <input type="number" inputmode="decimal" id="duree" placeholder="15" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
                     </div>
                     <div class="flex items-center justify-between bg-[#16161a] p-3 rounded-xl border border-white/5">
                         <span class="text-xs font-medium text-gray-400">Ajuster à l'inflation (-2%)</span>
-                        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in"><input type="checkbox" name="toggle" id="inflation-check" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 ease-in-out" style="top: 2px; left: 2px;"/><label for="inflation-check" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer"></label></div>
+                        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="toggle" id="inflation-check" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 ease-in-out" style="top: 2px; left: 2px;"/>
+                            <label for="inflation-check" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer"></label>
+                        </div>
                     </div>
                     <button onclick="calculerEpargne()" class="w-full py-3 rounded-xl font-bold text-white mt-2 bg-indigo-600 hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20">Calculer</button>
                 </div>
 
                 <div id="form-objectif" class="space-y-5 hidden-section">
                     <h2 class="text-xl font-bold text-amber-500 mb-4">Objectif Millionnaire</h2>
-                    <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Somme Ciblée</label><input type="number" inputmode="decimal" id="obj-montant" placeholder="Ex: 50000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 border-amber-500/30 focus:border-amber-500"></div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Dans (Ans)</label><input type="number" inputmode="decimal" id="obj-duree" placeholder="10" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center"></div>
-                        <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Mise/Mois</label><input type="number" inputmode="decimal" id="obj-mensuel" placeholder="Ex: 200" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center"></div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Somme Ciblée</label>
+                        <input type="number" inputmode="decimal" id="obj-montant" placeholder="Ex: 50000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 border-amber-500/30 focus:border-amber-500">
                     </div>
-                    <div class="bg-[#16161a] p-3 rounded-xl border border-white/5"><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Départ (Optionnel)</label><input type="number" inputmode="decimal" id="obj-depart" placeholder="Ex: 1000" class="input-field w-full rounded-lg px-3 py-2 text-sm mt-1"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Dans (Ans)</label>
+                            <input type="number" inputmode="decimal" id="obj-duree" placeholder="10" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Mise/Mois</label>
+                            <input type="number" inputmode="decimal" id="obj-mensuel" placeholder="Ex: 200" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
+                    </div>
+                    <div class="bg-[#16161a] p-3 rounded-xl border border-white/5">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Départ (Optionnel)</label>
+                        <input type="number" inputmode="decimal" id="obj-depart" placeholder="Ex: 1000" class="input-field w-full rounded-lg px-3 py-2 text-sm mt-1">
+                    </div>
                     <button onclick="calculerObjectif()" class="w-full py-3 rounded-xl font-bold text-white mt-2 bg-amber-600 hover:bg-amber-500 transition shadow-lg shadow-amber-500/20">Trouver le Taux</button>
                 </div>
 
                 <div id="form-immo" class="space-y-5 hidden-section">
                     <h2 class="text-xl font-bold text-pink-500 mb-4">Crédit Immobilier</h2>
-                    <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Prix du bien</label><input type="number" inputmode="decimal" id="immo-montant" placeholder="Ex: 250000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1"></div>
-                    <div class="flex items-center justify-between px-1"><label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Inclure Notaire (~7.5%)</label><input type="checkbox" id="notaire-check" class="w-5 h-5 accent-pink-500 rounded cursor-pointer"></div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Prix du bien</label>
+                        <input type="number" inputmode="decimal" id="immo-montant" placeholder="Ex: 250000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
+                    </div>
+                    <div class="flex items-center justify-between px-1">
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Inclure Notaire (~7.5%)</label>
+                        <input type="checkbox" id="notaire-check" class="w-5 h-5 accent-pink-500 rounded cursor-pointer">
+                    </div>
                     <div class="grid grid-cols-2 gap-3">
-                        <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Taux (%)</label><input type="number" inputmode="decimal" id="immo-taux" placeholder="3.8" step="0.1" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center"></div>
-                        <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Années</label><input type="number" inputmode="decimal" id="immo-duree" placeholder="25" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center"></div>
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Taux (%)</label>
+                            <input type="number" inputmode="decimal" id="immo-taux" placeholder="3.8" step="0.1" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Années</label>
+                            <input type="number" inputmode="decimal" id="immo-duree" placeholder="25" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
                     </div>
                     <button onclick="calculerImmo()" class="w-full py-3 rounded-xl font-bold text-white mt-2 bg-pink-600 hover:bg-pink-500 transition shadow-lg shadow-pink-500/20">Simuler</button>
                 </div>
@@ -160,20 +214,41 @@
                 <div id="form-rentbuy" class="space-y-5 hidden-section">
                     <h2 class="text-xl font-bold text-cyan-400 mb-4">Louer ou Acheter ?</h2>
                     <div class="grid grid-cols-2 gap-3">
-                        <div><label class="text-[11px] font-bold text-cyan-500 uppercase ml-1">Loyer Actuel</label><input type="number" inputmode="decimal" id="rb-loyer" placeholder="800" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1"></div>
-                        <div><label class="text-[11px] font-bold text-pink-500 uppercase ml-1">Prix Achat</label><input type="number" inputmode="decimal" id="rb-prix" placeholder="200000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1"></div>
+                        <div>
+                            <label class="text-[11px] font-bold text-cyan-500 uppercase ml-1">Loyer Actuel</label>
+                            <input type="number" inputmode="decimal" id="rb-loyer" placeholder="800" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-pink-500 uppercase ml-1">Prix Achat</label>
+                            <input type="number" inputmode="decimal" id="rb-prix" placeholder="200000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
+                        </div>
                     </div>
-                    <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Apport Personnel</label><input type="number" inputmode="decimal" id="rb-apport" placeholder="20000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1"></div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Apport Personnel</label>
+                        <input type="number" inputmode="decimal" id="rb-apport" placeholder="20000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
+                    </div>
                     <button onclick="calculerRentBuy()" class="w-full py-3 rounded-xl font-bold text-white mt-2 bg-gradient-to-r from-cyan-600 to-pink-600 hover:opacity-90 transition shadow-lg shadow-cyan-500/20">Comparer</button>
                 </div>
 
                 <div id="form-capacite" class="space-y-5 hidden-section">
                     <h2 class="text-xl font-bold text-emerald-400 mb-4">Ma Capacité d'Emprunt</h2>
-                    <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Revenus Net</label><input type="number" inputmode="decimal" id="revenus" placeholder="Ex: 3000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1"></div>
-                    <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Charges / Crédits</label><input type="number" inputmode="decimal" id="charges" placeholder="Ex: 0" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1"></div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Revenus Net</label>
+                        <input type="number" inputmode="decimal" id="revenus" placeholder="Ex: 3000" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Charges / Crédits</label>
+                        <input type="number" inputmode="decimal" id="charges" placeholder="Ex: 0" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1">
+                    </div>
                     <div class="grid grid-cols-2 gap-3">
-                        <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Taux (%)</label><input type="number" inputmode="decimal" id="cap-taux" placeholder="3.8" step="0.1" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center"></div>
-                        <div><label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Années</label><input type="number" inputmode="decimal" id="cap-duree" placeholder="25" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center"></div>
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Taux (%)</label>
+                            <input type="number" inputmode="decimal" id="cap-taux" placeholder="3.8" step="0.1" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-gray-500 uppercase ml-1">Années</label>
+                            <input type="number" inputmode="decimal" id="cap-duree" placeholder="25" class="input-field w-full rounded-xl px-4 py-3 text-lg font-medium mt-1 text-center">
+                        </div>
                     </div>
                     <button onclick="calculerCapacite()" class="w-full py-3 rounded-xl font-bold text-white mt-2 bg-emerald-600 hover:bg-emerald-500 transition shadow-lg shadow-emerald-500/20">Calculer Enveloppe</button>
                 </div>
@@ -216,51 +291,67 @@
     </div>
 
     <script>
-        // --- 1. GOOGLE ANALYTICS (TON ID EST ICI) ---
+        // --- 1. CONFIGURATION GOOGLE ANALYTICS (CONSENT MODE V2) ---
         const GA_ID = 'G-M20W2D39X7';
 
-        function loadGoogleAnalytics() {
-            const script = document.createElement('script');
-            script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
-            script.async = true;
-            document.head.appendChild(script);
+        // Définition initiale de la fonction gtag
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
 
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', GA_ID);
+        // Par défaut : On refuse tout (DENIED)
+        gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'analytics_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied'
+        });
 
-            console.log("Google Analytics activé !");
-        }
+        // Chargement du script Google
+        const script = document.createElement('script');
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`;
+        script.async = true;
+        document.head.appendChild(script);
 
-        // --- 2. GESTION COOKIES ---
+        gtag('js', new Date());
+        gtag('config', GA_ID);
+
+        // --- 2. GESTION DU BANDEAU COOKIE ---
         const banner = document.getElementById('cookie-banner');
         const consent = localStorage.getItem('cookieConsent');
 
-        // Affichage du bandeau si pas de choix
-        if (!consent) {
-            setTimeout(() => banner.classList.remove('hidden-banner'), 1000);
-        } else if (consent === 'accepted') {
-            loadGoogleAnalytics();
-        }
+        function updateConsent(granted) {
+            const status = granted ? 'granted' : 'denied';
 
-        function gererCookies(accepte) {
-            if (accepte) {
-                localStorage.setItem('cookieConsent', 'accepted');
-                loadGoogleAnalytics();
-            } else {
-                localStorage.setItem('cookieConsent', 'refused');
-            }
+            // Mise à jour du consentement pour Google
+            gtag('consent', 'update', {
+                'ad_storage': status,
+                'analytics_storage': status,
+                'ad_user_data': status,
+                'ad_personalization': status
+            });
+
+            // Sauvegarde du choix
+            localStorage.setItem('cookieConsent', granted ? 'accepted' : 'refused');
             banner.classList.add('hidden-banner');
         }
 
-        // --- 3. MOTEUR LOGIQUE (FONCTIONS DÉPLIÉES POUR LISIBILITÉ) ---
+        // Affichage du bandeau si aucun choix n'a été fait
+        if (!consent) {
+            setTimeout(() => banner.classList.remove('hidden-banner'), 1000);
+        } else if (consent === 'accepted') {
+            updateConsent(true);
+        }
 
+        function gererCookies(accepte) {
+            updateConsent(accepte);
+        }
+
+        // --- 3. CONFIGURATION GÉNÉRALE ---
         let myChart;
         Chart.defaults.color = '#6b7280';
         Chart.defaults.font.family = 'Outfit';
 
-        // Sauvegarde automatique dans le navigateur
+        // --- 4. SAUVEGARDE AUTOMATIQUE DES CHAMPS ---
         function saveInputs() {
             document.querySelectorAll('input').forEach(input => {
                 if(input.id) {
@@ -279,13 +370,14 @@
                 }
             });
         }
+        // On écoute chaque changement pour sauvegarder
         document.addEventListener('input', saveInputs);
 
-        // Génération PDF
+        // --- 5. GÉNÉRATION PDF ---
         function downloadPDF() {
             const element = document.getElementById('app-container');
             const opt = {
-                margin: 10,
+                margin: [10, 10],
                 filename: 'ma-simulation-finance.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, backgroundColor: '#050505' },
@@ -294,19 +386,21 @@
             html2pdf().set(opt).from(element).save();
         }
 
-        // Système d'Onglets
+        // --- 6. SYSTÈME D'ONGLETS ---
         function switchTab(tab) {
             const tabs = ['epargne', 'immo', 'capacite', 'objectif', 'rentbuy'];
 
+            // On cache tout
             tabs.forEach(t => {
                 document.getElementById('form-' + t).classList.add('hidden-section');
                 document.getElementById('tab-' + t).classList.remove('active');
             });
 
+            // On affiche l'onglet demandé
             document.getElementById('form-' + tab).classList.remove('hidden-section');
             document.getElementById('tab-' + tab).classList.add('active');
 
-            // Lance le calcul correspondant
+            // On lance le calcul associé
             if(tab === 'epargne') calculerEpargne();
             if(tab === 'immo') calculerImmo();
             if(tab === 'capacite') calculerCapacite();
@@ -314,7 +408,7 @@
             if(tab === 'rentbuy') calculerRentBuy();
         }
 
-        // Outils de formatage
+        // --- 7. OUTILS DE FORMATAGE ---
         function formatMoney(amount) {
             return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
         }
@@ -327,12 +421,15 @@
             document.getElementById('kpi-val-2').innerText = typeof v2 === 'number' ? formatMoney(v2) : v2;
             document.getElementById('kpi-val-2').className = "text-4xl font-bold mt-2 tracking-tight " + colorClass;
 
+            // Animation des blobs de couleur
             const blobClass = `absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-20 -mr-10 -mt-10 ${blobColor}`;
             document.getElementById('blob-1').className = blobClass;
             document.getElementById('blob-2').className = blobClass;
         }
 
-        // --- CALCUL : ÉPARGNE ---
+        // --- 8. MOTEURS DE CALCUL ---
+
+        // -- ÉPARGNE --
         function calculerEpargne() {
             const capital = parseFloat(document.getElementById('capital').value);
             const mensuel = parseFloat(document.getElementById('mensuel').value);
@@ -371,7 +468,7 @@
             drawChart(labels, dataInv, dataInt, "Capital Investi", "Intérêts", '#6366f1', '#a5b4fc');
         }
 
-        // --- CALCUL : OBJECTIF ---
+        // -- OBJECTIF --
         function calculerObjectif() {
             const cible = parseFloat(document.getElementById('obj-montant').value);
             const duree = parseFloat(document.getElementById('obj-duree').value);
@@ -380,7 +477,6 @@
 
             if(isNaN(cible) || isNaN(duree)) return;
 
-            // Algorithme dichotomique pour trouver le taux
             let minRate = 0;
             let maxRate = 100;
             let foundRate = 0;
@@ -422,7 +518,7 @@
             drawChart(labels, dataCapital, dataInterets, "Vos Versements", "Intérêts Requis", '#d97706', '#fcd34d');
         }
 
-        // --- CALCUL : IMMO ---
+        // -- CRÉDIT IMMOBILIER --
         function calculerImmo() {
             let montant = parseFloat(document.getElementById('immo-montant').value);
             const taux = parseFloat(document.getElementById('immo-taux').value) / 100;
@@ -470,7 +566,7 @@
             drawChart(labels, dataCap, dataInt, "Remboursé", "Coût", '#db2777', '#f472b6');
         }
 
-        // --- CALCUL : RENT vs BUY ---
+        // -- LOUER vs ACHETER --
         function calculerRentBuy() {
             const loyer = parseFloat(document.getElementById('rb-loyer').value);
             const prix = parseFloat(document.getElementById('rb-prix').value);
@@ -478,7 +574,6 @@
 
             if(isNaN(loyer) || isNaN(prix)) return;
 
-            // Hypothèses
             const duree = 25;
             const tauxImmo = 0.04;
             const tauxEpargne = 0.03;
@@ -547,7 +642,7 @@
             });
         }
 
-        // --- CALCUL : CAPACITÉ ---
+        // -- CAPACITÉ D'EMPRUNT --
         function calculerCapacite() {
             const revenus = parseFloat(document.getElementById('revenus').value);
             const charges = parseFloat(document.getElementById('charges').value) || 0;
@@ -595,7 +690,7 @@
             });
         }
 
-        // --- DESSIN GRAPHIQUE GÉNÉRIQUE ---
+        // --- 9. DESSIN GRAPHIQUE UNIFIÉ ---
         function drawChart(labels, d1, d2, l1, l2, c1, c2) {
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
@@ -647,7 +742,7 @@
             });
         }
 
-        // Initialisation
+        // --- 10. LANCEMENT INITIAL ---
         loadInputs();
         if(document.getElementById('capital').value) calculerEpargne();
 
