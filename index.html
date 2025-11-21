@@ -3,181 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Assistant Financier</title>
+    <title>Assistant Personnel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- DESIGN SYSTEM PREMIUM --- */
+        /* --- DESIGN SYSTEM V5 --- */
         body { font-family: 'Outfit', sans-serif; background-color: #050505; color: white; -webkit-tap-highlight-color: transparent; }
 
-        /* Fond animé subtil */
         .bg-gradient-custom {
-            background: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.1) 0%, transparent 40%),
-                        radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 40%);
+            background: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
         }
 
-        /* Effet Verre "Glassmorphism" Premium */
         .glass {
-            background: rgba(22, 22, 26, 0.7);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            background: rgba(22, 22, 26, 0.75);
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
         }
 
-        /* Inputs ultra ergonomiques */
         .input-field {
-            background: #0f0f11;
-            border: 1px solid #2c2c30;
-            color: white;
-            transition: all 0.3s ease;
-            font-family: 'Outfit', sans-serif;
+            background: #0f0f11; border: 1px solid #2c2c30; color: white; transition: all 0.3s ease;
         }
         .input-field:focus {
-            border-color: #6366f1;
-            background: #16161a;
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+            border-color: #6366f1; background: #16161a; outline: none; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
         }
+        ::placeholder { color: #4b5563; opacity: 1; }
 
-        /* Onglets */
-        .tab-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0.5; position: relative; }
+        /* Scrollbar cachée pour le menu des onglets */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .tab-btn { white-space: nowrap; transition: all 0.3s; opacity: 0.5; position: relative; padding-bottom: 8px; }
         .tab-btn.active { opacity: 1; color: white; }
         .tab-btn.active::after {
-            content: ''; position: absolute; bottom: -4px; left: 50%; transform: translateX(-50%);
-            width: 20px; height: 3px; background: #6366f1; border-radius: 10px;
-            box-shadow: 0 0 10px #6366f1;
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 3px; background: #6366f1; border-radius: 10px; box-shadow: 0 0 10px #6366f1;
         }
 
-        .hidden-section { display: none; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden-section { display: none; }
+
+        /* Toggle Switch pour l'inflation */
+        .toggle-checkbox:checked { right: 0; border-color: #6366f1; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #6366f1; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 bg-black bg-gradient-custom">
 
-    <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div id="app-container" class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6">
 
         <div class="lg:col-span-12 flex items-center justify-between mb-2">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 relative">
-                    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="40" height="40" rx="12" fill="url(#paint0_linear)"/>
-                        <path d="M12 28L20 12L28 28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 28H28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                        <circle cx="20" cy="22" r="3" fill="white"/>
-                        <defs>
-                            <linearGradient id="paint0_linear" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#4F46E5"/>
-                                <stop offset="1" stop-color="#EC4899"/>
-                            </linearGradient>
-                        </defs>
-                    </svg>
+                <div class="w-10 h-10 relative flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/20">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-wide">FINANCE<span class="text-indigo-400">.AI</span></h1>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-[0.2em]">Personal Assistant</p>
+                    <h1 class="text-lg font-bold tracking-wide">MY FINANCE</h1>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-[0.2em]">Assistant Personnel</p>
                 </div>
             </div>
+            <button onclick="downloadPDF()" class="flex items-center gap-2 bg-[#1c1c21] hover:bg-[#25252b] border border-white/10 text-xs font-bold px-4 py-2 rounded-lg transition">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <span class="hidden sm:inline text-gray-400">PDF</span>
+            </button>
         </div>
 
         <div class="lg:col-span-4 glass rounded-[32px] p-6 lg:p-8 h-fit flex flex-col">
 
-            <div class="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+            <div class="flex items-center gap-6 overflow-x-auto scrollbar-hide mb-8 border-b border-white/10 pb-1">
                 <button onclick="switchTab('epargne')" id="tab-epargne" class="tab-btn active text-sm font-semibold tracking-wide">ÉPARGNE</button>
+                <button onclick="switchTab('objectif')" id="tab-objectif" class="tab-btn text-sm font-semibold tracking-wide">OBJECTIF</button>
                 <button onclick="switchTab('immo')" id="tab-immo" class="tab-btn text-sm font-semibold tracking-wide">CRÉDIT</button>
+                <button onclick="switchTab('rentbuy')" id="tab-rentbuy" class="tab-btn text-sm font-semibold tracking-wide">LOUER/ACHETER</button>
                 <button onclick="switchTab('capacite')" id="tab-capacite" class="tab-btn text-sm font-semibold tracking-wide">CAPACITÉ</button>
             </div>
 
             <div id="form-epargne" class="space-y-5">
                 <div>
                     <label class="text-[11px] font-bold text-indigo-400 uppercase tracking-wider ml-1">Capital de départ</label>
-                    <input type="number" inputmode="decimal" id="capital" value="1000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
+                    <input type="number" inputmode="decimal" id="capital" placeholder="Ex: 1000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-indigo-400 uppercase tracking-wider ml-1">Ajout mensuel</label>
-                    <input type="number" inputmode="decimal" id="mensuel" value="200" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
+                    <input type="number" inputmode="decimal" id="mensuel" placeholder="Ex: 200" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Taux (%)</label>
-                        <input type="number" inputmode="decimal" id="taux" value="5" step="0.1" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                        <input type="number" inputmode="decimal" id="taux" placeholder="5" step="0.1" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Années</label>
-                        <input type="number" inputmode="decimal" id="duree" value="15" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                        <input type="number" inputmode="decimal" id="duree" placeholder="15" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
                     </div>
                 </div>
-                <button onclick="calculerEpargne()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-indigo-600 hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20">
-                    Simuler
-                </button>
+
+                <div class="flex items-center justify-between bg-[#16161a] p-3 rounded-xl border border-white/5">
+                    <span class="text-xs font-medium text-gray-400">Ajuster à l'inflation (-2%)</span>
+                    <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" name="toggle" id="inflation-check" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 ease-in-out" style="top: 2px; left: 2px;"/>
+                        <label for="inflation-check" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer"></label>
+                    </div>
+                </div>
+
+                <button onclick="calculerEpargne()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-indigo-600 hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20">Simuler</button>
+            </div>
+
+            <div id="form-objectif" class="space-y-5 hidden-section">
+                <div>
+                    <label class="text-[11px] font-bold text-amber-500 uppercase tracking-wider ml-1">Somme Ciblée (Le Rêve)</label>
+                    <input type="number" inputmode="decimal" id="obj-montant" placeholder="Ex: 50000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 border-amber-500/30 focus:border-amber-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Dans (Ans)</label>
+                        <input type="number" inputmode="decimal" id="obj-duree" placeholder="10" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Taux (%)</label>
+                        <input type="number" inputmode="decimal" id="obj-taux" placeholder="5" step="0.1" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                    </div>
+                </div>
+                <div class="bg-[#16161a] p-4 rounded-xl border border-white/5">
+                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Capital de départ (Optionnel)</label>
+                    <input type="number" inputmode="decimal" id="obj-depart" placeholder="Ex: 1000" class="input-field w-full rounded-xl px-4 py-2 text-sm mt-2">
+                </div>
+                <button onclick="calculerObjectif()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-amber-600 hover:bg-amber-500 transition shadow-lg shadow-amber-500/20">Calculer l'effort</button>
             </div>
 
             <div id="form-immo" class="space-y-5 hidden-section">
                 <div>
                     <label class="text-[11px] font-bold text-pink-500 uppercase tracking-wider ml-1">Prix du bien</label>
-                    <input type="number" inputmode="decimal" id="immo-montant" value="250000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
+                    <input type="number" inputmode="decimal" id="immo-montant" placeholder="Ex: 250000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
                 </div>
                 <div class="flex items-center justify-between px-1">
                     <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Inclure Frais de Notaire (~7.5%)</label>
-                    <input type="checkbox" id="notaire-check" checked class="w-5 h-5 accent-pink-500 rounded">
+                    <input type="checkbox" id="notaire-check" class="w-5 h-5 accent-pink-500 rounded cursor-pointer">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Taux (%)</label>
-                        <input type="number" inputmode="decimal" id="immo-taux" value="3.8" step="0.1" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                        <input type="number" inputmode="decimal" id="immo-taux" placeholder="3.8" step="0.1" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Années</label>
-                        <input type="number" inputmode="decimal" id="immo-duree" value="25" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                        <input type="number" inputmode="decimal" id="immo-duree" placeholder="25" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
                     </div>
                 </div>
-                <button onclick="calculerImmo()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-pink-600 hover:bg-pink-500 transition shadow-lg shadow-pink-500/20">
-                    Calculer Mensualité
-                </button>
+                <button onclick="calculerImmo()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-pink-600 hover:bg-pink-500 transition shadow-lg shadow-pink-500/20">Calculer Mensualité</button>
+            </div>
+
+            <div id="form-rentbuy" class="space-y-5 hidden-section">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[11px] font-bold text-cyan-500 uppercase tracking-wider ml-1">Loyer Actuel</label>
+                        <input type="number" inputmode="decimal" id="rb-loyer" placeholder="800" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-pink-500 uppercase tracking-wider ml-1">Prix Achat</label>
+                        <input type="number" inputmode="decimal" id="rb-prix" placeholder="200000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Apport Personnel</label>
+                    <input type="number" inputmode="decimal" id="rb-apport" placeholder="20000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
+                </div>
+                <button onclick="calculerRentBuy()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-gradient-to-r from-cyan-600 to-pink-600 hover:opacity-90 transition shadow-lg shadow-cyan-500/20">Comparer</button>
+                <p class="text-[10px] text-gray-500 text-center mt-2">Hypothèses : Taux 4%, Notaire 7.5%, Charges Proprio 1%/an</p>
             </div>
 
             <div id="form-capacite" class="space-y-5 hidden-section">
                 <div>
-                    <label class="text-[11px] font-bold text-emerald-500 uppercase tracking-wider ml-1">Revenus Mensuels (Net)</label>
-                    <input type="number" inputmode="decimal" id="revenus" value="3000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
+                    <label class="text-[11px] font-bold text-emerald-500 uppercase tracking-wider ml-1">Revenus Net</label>
+                    <input type="number" inputmode="decimal" id="revenus" placeholder="Ex: 3000" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
                 </div>
                 <div>
-                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Charges / Crédits en cours</label>
-                    <input type="number" inputmode="decimal" id="charges" value="0" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
+                    <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Charges / Crédits</label>
+                    <input type="number" inputmode="decimal" id="charges" placeholder="Ex: 0" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Taux (%)</label>
-                        <input type="number" inputmode="decimal" id="cap-taux" value="3.8" step="0.1" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                        <input type="number" inputmode="decimal" id="cap-taux" placeholder="3.8" step="0.1" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider ml-1">Années</label>
-                        <input type="number" inputmode="decimal" id="cap-duree" value="25" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
+                        <input type="number" inputmode="decimal" id="cap-duree" placeholder="25" class="input-field w-full rounded-2xl px-4 py-4 text-lg font-medium mt-2 text-center">
                     </div>
                 </div>
-                <button onclick="calculerCapacite()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-emerald-600 hover:bg-emerald-500 transition shadow-lg shadow-emerald-500/20">
-                    Calculer mon enveloppe
-                </button>
+                <button onclick="calculerCapacite()" class="w-full py-4 rounded-2xl font-bold text-white mt-4 bg-emerald-600 hover:bg-emerald-500 transition shadow-lg shadow-emerald-500/20">Calculer Enveloppe</button>
             </div>
         </div>
 
         <div class="lg:col-span-8 flex flex-col gap-6">
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="glass rounded-[24px] p-6 relative overflow-hidden">
                     <div id="blob-1" class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-full blur-[60px] opacity-20 -mr-10 -mt-10"></div>
                     <p id="kpi-label-1" class="text-gray-400 text-xs font-bold tracking-widest uppercase">TOTAL</p>
-                    <h2 id="kpi-val-1" class="text-4xl font-bold mt-2 tracking-tight">0 €</h2>
+                    <h2 id="kpi-val-1" class="text-4xl font-bold mt-2 tracking-tight">-- €</h2>
                 </div>
                 <div class="glass rounded-[24px] p-6 relative overflow-hidden">
                     <div id="blob-2" class="absolute top-0 right-0 w-32 h-32 bg-purple-500 rounded-full blur-[60px] opacity-20 -mr-10 -mt-10"></div>
                     <p id="kpi-label-2" class="text-indigo-400 text-xs font-bold tracking-widest uppercase">DÉTAILS</p>
-                    <h2 id="kpi-val-2" class="text-4xl font-bold mt-2 tracking-tight text-indigo-400">0 €</h2>
+                    <h2 id="kpi-val-2" class="text-4xl font-bold mt-2 tracking-tight text-indigo-400">-- €</h2>
                 </div>
             </div>
-
             <div class="glass rounded-[32px] p-6 flex-1 min-h-[350px] relative">
                 <canvas id="financeChart"></canvas>
             </div>
@@ -189,189 +222,262 @@
         Chart.defaults.color = '#6b7280';
         Chart.defaults.font.family = 'Outfit';
 
-        function switchTab(tab) {
-            ['epargne', 'immo', 'capacite'].forEach(t => {
-                document.getElementById('form-'+t).classList.add('hidden-section');
-                document.getElementById('tab-'+t).classList.remove('active');
+        // --- SAUVEGARDE AUTO ---
+        function saveInputs() {
+            document.querySelectorAll('input').forEach(input => {
+                if(input.id) localStorage.setItem(input.id, input.type === 'checkbox' ? input.checked : input.value);
             });
+        }
+        function loadInputs() {
+            document.querySelectorAll('input').forEach(input => {
+                if(input.id) {
+                    const val = localStorage.getItem(input.id);
+                    if(val !== null) input.type === 'checkbox' ? input.checked = (val === 'true') : input.value = val;
+                }
+            });
+        }
+        document.addEventListener('input', saveInputs);
 
+        // --- PDF ---
+        function downloadPDF() {
+            const element = document.body;
+            const opt = { margin:0, filename:'mon-plan-finance.pdf', image:{type:'jpeg', quality:0.98}, html2canvas:{scale:2, backgroundColor:'#050505'}, jsPDF:{unit:'in', format:'a4', orientation:'landscape'} };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // --- NAVIGATION ---
+        function switchTab(tab) {
+            ['epargne', 'immo', 'capacite', 'objectif', 'rentbuy'].forEach(t => {
+                const form = document.getElementById('form-'+t);
+                const btn = document.getElementById('tab-'+t);
+                if(form) form.classList.add('hidden-section');
+                if(btn) btn.classList.remove('active');
+            });
             document.getElementById('form-'+tab).classList.remove('hidden-section');
             document.getElementById('tab-'+tab).classList.add('active');
 
             if(tab === 'epargne') calculerEpargne();
             if(tab === 'immo') calculerImmo();
             if(tab === 'capacite') calculerCapacite();
+            if(tab === 'objectif') calculerObjectif();
+            if(tab === 'rentbuy') calculerRentBuy();
         }
 
         function formatMoney(amount) {
             return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount);
         }
-
         function updateKPI(l1, v1, l2, v2, colorClass) {
             document.getElementById('kpi-label-1').innerText = l1;
             document.getElementById('kpi-val-1').innerText = formatMoney(v1);
             document.getElementById('kpi-label-2').innerText = l2;
-            document.getElementById('kpi-val-2').innerText = formatMoney(v2);
+            document.getElementById('kpi-val-2').innerText = typeof v2 === 'number' ? formatMoney(v2) : v2;
             document.getElementById('kpi-val-2').className = "text-4xl font-bold mt-2 tracking-tight " + colorClass;
         }
 
-        // --- 1. EPARGNE ---
+        // --- 1. ÉPARGNE (Inflation Ready) ---
         function calculerEpargne() {
-            const capital = parseFloat(document.getElementById('capital').value) || 0;
-            const mensuel = parseFloat(document.getElementById('mensuel').value) || 0;
-            const taux = parseFloat(document.getElementById('taux').value) / 100 || 0;
-            const duree = parseInt(document.getElementById('duree').value) || 0;
+            const capital = parseFloat(document.getElementById('capital').value);
+            const mensuel = parseFloat(document.getElementById('mensuel').value);
+            let taux = parseFloat(document.getElementById('taux').value);
+            const duree = parseInt(document.getElementById('duree').value);
+            const inflation = document.getElementById('inflation-check').checked;
+
+            if(isNaN(capital) || isNaN(duree)) return;
+
+            // Si inflation activée, on réduit le rendement réel de 2%
+            if(inflation) taux = taux - 2;
 
             const labels = []; const dataInv = []; const dataInt = [];
-
             for (let i = 0; i <= duree; i++) {
                 let mois = i * 12;
                 let totalVerse = capital + (mensuel * mois);
-                let totalReel = taux > 0
-                    ? (capital * Math.pow(1 + taux/12, mois)) + (mensuel * ((Math.pow(1 + taux/12, mois) - 1) / (taux/12)))
+                let totalReel = (taux !== 0)
+                    ? (capital * Math.pow(1 + taux/100/12, mois)) + (mensuel * ((Math.pow(1 + taux/100/12, mois) - 1) / (taux/100/12)))
                     : totalVerse;
 
-                labels.push("Année " + i);
-                dataInv.push(totalVerse);
-                dataInt.push(totalReel - totalVerse);
+                labels.push("Année " + i); dataInv.push(totalVerse); dataInt.push(totalReel - totalVerse);
             }
-
-            updateKPI("PATRIMOINE TOTAL", dataInv[duree] + dataInt[duree], "INTÉRÊTS GÉNÉRÉS", dataInt[duree], "text-indigo-400");
+            let total = dataInv[duree] + dataInt[duree];
+            let labelKPI = inflation ? "TOTAL (Ajusté Inflation)" : "PATRIMOINE TOTAL";
+            updateKPI(labelKPI, total, "GAINS BRUTS", dataInt[duree], "text-indigo-400");
             drawChart(labels, dataInv, dataInt, "Capital Investi", "Intérêts", '#6366f1', '#a5b4fc');
         }
 
-        // --- 2. IMMOBILIER (Avec Notaire) ---
-        function calculerImmo() {
-            let montant = parseFloat(document.getElementById('immo-montant').value) || 0;
-            const taux = parseFloat(document.getElementById('immo-taux').value) / 100 || 0;
-            const duree = parseInt(document.getElementById('immo-duree').value) || 0;
-            const withNotaire = document.getElementById('notaire-check').checked;
+        // --- 2. OBJECTIF MILLIONNAIRE ---
+        function calculerObjectif() {
+            const cible = parseFloat(document.getElementById('obj-montant').value);
+            const duree = parseFloat(document.getElementById('obj-duree').value);
+            const taux = parseFloat(document.getElementById('obj-taux').value) / 100;
+            const depart = parseFloat(document.getElementById('obj-depart').value) || 0;
 
-            // Ajout des frais de notaire (~7.5%) au montant à emprunter
-            let montantEmprunte = montant;
-            let fraisNotaire = 0;
-            if (withNotaire) {
-                fraisNotaire = montant * 0.075;
-                montantEmprunte += fraisNotaire;
-            }
-
-            const nbMois = duree * 12;
-            const tm = taux / 12;
-            let mensualite = taux > 0 ? montantEmprunte * (tm * Math.pow(1 + tm, nbMois)) / (Math.pow(1 + tm, nbMois) - 1) : montantEmprunte / nbMois;
-
-            const labels = []; const dataCap = []; const dataInt = [];
-            let solde = montantEmprunte;
-            let cumulInt = 0; let cumulCap = 0;
-
-            for (let m = 0; m <= nbMois; m++) {
-                if (m % 12 === 0) {
-                    labels.push(m/12 + " ans");
-                    dataCap.push(cumulCap);
-                    dataInt.push(cumulInt);
-                }
-                if (m < nbMois) {
-                    let intM = solde * tm;
-                    let capM = mensualite - intM;
-                    solde -= capM;
-                    cumulInt += intM;
-                    cumulCap += capM;
-                }
-            }
-
-            // Affichage intelligent
-            let detailText = withNotaire ? `DONT NOTAIRE (${formatMoney(fraisNotaire)})` : `COÛT TOTAL CRÉDIT`;
-            let detailVal = withNotaire ? cumulInt + fraisNotaire : cumulInt;
-
-            updateKPI("MENSUALITÉ", mensualite, "COÛT CRÉDIT + FRAIS", detailVal, "text-pink-500");
-            drawChart(labels, dataCap, dataInt, "Capital Remboursé", "Coût Banque", '#db2777', '#f472b6');
-        }
-
-        // --- 3. CAPACITÉ D'EMPRUNT (Nouveau) ---
-        function calculerCapacite() {
-            const revenus = parseFloat(document.getElementById('revenus').value) || 0;
-            const charges = parseFloat(document.getElementById('charges').value) || 0;
-            const taux = parseFloat(document.getElementById('cap-taux').value) / 100 || 0;
-            const duree = parseInt(document.getElementById('cap-duree').value) || 0;
-
-            // Règle des 35% d'endettement max
-            const resteAVivre = revenus - charges;
-            const mensualiteMax = resteAVivre * 0.35; // 35% d'endettement
+            if(isNaN(cible) || isNaN(duree) || isNaN(taux)) return;
 
             const nbMois = duree * 12;
             const tm = taux / 12;
 
-            // Formule inversée du crédit pour trouver le capital
-            // C = M * (1 - (1+t)^-n) / t
-            let capitalMax = 0;
-            if (taux > 0) {
-                capitalMax = mensualiteMax * (1 - Math.pow(1 + tm, -nbMois)) / tm;
-            } else {
-                capitalMax = mensualiteMax * nbMois;
+            // Formule V = C(1+r)^n + M * ... => on cherche M (Mensualité)
+            // ValeurFutureDepart = depart * (1+tm)^nbMois
+            // ResteAProduire = Cible - ValeurFutureDepart
+            // M = Reste * tm / ((1+tm)^nbMois - 1)
+
+            let valFutureDepart = depart * Math.pow(1 + tm, nbMois);
+            let reste = cible - valFutureDepart;
+            let effortMensuel = 0;
+
+            if (reste > 0) {
+                effortMensuel = (reste * tm) / (Math.pow(1 + tm, nbMois) - 1);
             }
 
-            const coutTotal = (mensualiteMax * nbMois) - capitalMax;
+            updateKPI("CIBLE À ATTEINDRE", cible, "EFFORT MENSUEL REQUIS", effortMensuel, "text-amber-500");
 
-            // Pour le graphique, on montre la répartition Capital / Intérêts sur l'enveloppe totale
-            const labels = ["Répartition"];
-
-            updateKPI("ENVELOPPE MAX (Bien + Frais)", capitalMax, "MENSUALITÉ MAX (35%)", mensualiteMax, "text-emerald-400");
-
-            // Graphique Donut Spécial pour la capacité
-            drawDonut(capitalMax, coutTotal);
+            // Graphique de projection
+            const labels = []; const dataCapital = []; const dataInterets = [];
+            for(let i=0; i<=duree; i++) {
+                let mois = i*12;
+                let epargneCumulee = (effortMensuel * mois) + depart;
+                let totalReel = (depart * Math.pow(1+tm, mois)) + (effortMensuel * ((Math.pow(1+tm, mois)-1)/tm));
+                labels.push("Année "+i);
+                dataCapital.push(epargneCumulee);
+                dataInterets.push(totalReel - epargneCumulee);
+            }
+            drawChart(labels, dataCapital, dataInterets, "Votre Effort", "Intérêts Magiques", '#d97706', '#fcd34d');
         }
 
-        // --- MOTEUR GRAPHIQUE UNIFIÉ ---
-        function drawChart(labels, d1, d2, l1, l2, c1, c2) {
+        // --- 3. LOUER vs ACHETER ---
+        function calculerRentBuy() {
+            const loyer = parseFloat(document.getElementById('rb-loyer').value);
+            const prix = parseFloat(document.getElementById('rb-prix').value);
+            const apport = parseFloat(document.getElementById('rb-apport').value) || 0;
+
+            if(isNaN(loyer) || isNaN(prix)) return;
+
+            // Hypothèses fixes pour simplifier
+            const duree = 25;
+            const tauxImmo = 0.04;
+            const tauxEpargne = 0.03;
+            const appreciationImmo = 0.01;
+            const fraisNotaire = prix * 0.075;
+            const chargesProprio = prix * 0.01; // Taxe fonciere + entretien / an
+
+            const labels = []; const wealthRenter = []; const wealthOwner = [];
+
+            // Scénario LOCATAIRE : Il place son apport + la différence (si Mensualité > Loyer)
+            // Scénario PROPRIO : Il paie son crédit, mais gagne la valeur de la maison
+
+            // Calcul mensualité crédit pour le proprio
+            const emprunt = prix + fraisNotaire - apport;
+            const tm = tauxImmo / 12;
+            const nbMois = duree * 12;
+            const mensualite = emprunt * (tm * Math.pow(1+tm, nbMois)) / (Math.pow(1+tm, nbMois)-1);
+
+            // Capacité d'épargne du locataire = (Mensualité + ChargesProprio/12) - Loyer
+            // On considère que l'effort financier est le même.
+            const chargesMensuellesProprio = chargesProprio / 12;
+            const budgetTotal = mensualite + chargesMensuellesProprio;
+            const epargneMensuelleLocataire = budgetTotal - loyer;
+
+            let capitalLocataire = apport;
+            let valeurMaison = prix;
+            let detteRestante = emprunt;
+
+            for(let an=0; an<=duree; an++) {
+                labels.push("Année "+an);
+
+                // Locataire
+                // Son capital grandit avec intérêts composés + épargne mensuelle
+                // VF = C(1+r)^n + Pmt... (simplifié annuel)
+                if(an > 0) {
+                    capitalLocataire = (capitalLocataire + (epargneMensuelleLocataire * 12)) * (1 + tauxEpargne);
+                    valeurMaison = valeurMaison * (1 + appreciationImmo);
+
+                    // Amortissement dette (approx)
+                    let partInteretAn = detteRestante * tauxImmo;
+                    let partCapitalAn = (mensualite * 12) - partInteretAn;
+                    detteRestante -= partCapitalAn;
+                    if(detteRestante < 0) detteRestante = 0;
+                }
+
+                wealthRenter.push(capitalLocataire);
+                wealthOwner.push(valeurMaison - detteRestante);
+            }
+
+            // Trouver le point de croisement
+            let breakEvenYear = "Jamais";
+            for(let i=1; i<wealthOwner.length; i++) {
+                if(wealthOwner[i] > wealthRenter[i]) { breakEvenYear = i + " ans"; break; }
+            }
+
+            updateKPI("RENTABLE À PARTIR DE", breakEvenYear, "PATRIMOINE À 25 ANS", wealthOwner[25], "text-cyan-400");
+
+            // Graphique comparatif (Lignes)
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
-
-            let grad1 = ctx.createLinearGradient(0, 0, 0, 400);
-            grad1.addColorStop(0, c1 + '80'); grad1.addColorStop(1, c1 + '00'); // Transparence hex
-
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: l2, data: d2, borderColor: c2, backgroundColor: c2 + '40', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 },
-                        { label: l1, data: d1, borderColor: c1, backgroundColor: grad1, borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }
+                        { label: 'Patrimoine PROPRIO', data: wealthOwner, borderColor: '#ec4899', borderWidth: 3, fill:false, tension:0.4 },
+                        { label: 'Patrimoine LOCATAIRE', data: wealthRenter, borderColor: '#06b6d4', borderWidth: 3, fill:false, tension:0.4 }
                     ]
                 },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: 'white', font: { family: 'Outfit' } } } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#52525b' } },
-                        y: { grid: { color: '#27272a' }, ticks: { color: '#52525b' }, stacked: true }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: 'white' } } }, scales: { x: { grid: { display: false }, ticks: { color: '#52525b' } }, y: { grid: { color: '#27272a' }, ticks: { color: '#52525b' } } } }
             });
         }
 
-        function drawDonut(capital, interets) {
+        function calculerImmo() {
+            // ... (Code identique V4)
+            let montant = parseFloat(document.getElementById('immo-montant').value);
+            const taux = parseFloat(document.getElementById('immo-taux').value) / 100;
+            const duree = parseInt(document.getElementById('immo-duree').value);
+            const withNotaire = document.getElementById('notaire-check').checked;
+            if(isNaN(montant) || isNaN(taux)) return;
+            let montantEmprunte = montant; let fraisNotaire = 0;
+            if (withNotaire) { fraisNotaire = montant * 0.075; montantEmprunte += fraisNotaire; }
+            const nbMois = duree * 12; const tm = taux / 12;
+            let mensualite = taux > 0 ? montantEmprunte * (tm * Math.pow(1 + tm, nbMois)) / (Math.pow(1 + tm, nbMois) - 1) : montantEmprunte / nbMois;
+            const labels = []; const dataCap = []; const dataInt = [];
+            let solde = montantEmprunte; let cumulInt = 0; let cumulCap = 0;
+            for (let m = 0; m <= nbMois; m++) {
+                if (m % 12 === 0) { labels.push(m/12 + " ans"); dataCap.push(cumulCap); dataInt.push(cumulInt); }
+                if (m < nbMois) { let intM = solde * tm; let capM = mensualite - intM; solde -= capM; cumulInt += intM; cumulCap += capM; }
+            }
+            let detailVal = withNotaire ? cumulInt + fraisNotaire : cumulInt;
+            updateKPI("MENSUALITÉ", mensualite, "COÛT CRÉDIT + FRAIS", detailVal, "text-pink-500");
+            drawChart(labels, dataCap, dataInt, "Capital Remboursé", "Coût Banque", '#db2777', '#f472b6');
+        }
+
+        function calculerCapacite() {
+            // ... (Code identique V4)
+            const revenus = parseFloat(document.getElementById('revenus').value);
+            const charges = parseFloat(document.getElementById('charges').value) || 0;
+            const taux = parseFloat(document.getElementById('cap-taux').value) / 100;
+            const duree = parseInt(document.getElementById('cap-duree').value);
+            if(isNaN(revenus) || isNaN(taux)) return;
+            const resteAVivre = revenus - charges;
+            const mensualiteMax = resteAVivre * 0.35;
+            const nbMois = duree * 12; const tm = taux / 12;
+            let capitalMax = taux > 0 ? mensualiteMax * (1 - Math.pow(1 + tm, -nbMois)) / tm : mensualiteMax * nbMois;
+            const coutTotal = (mensualiteMax * nbMois) - capitalMax;
+            updateKPI("ENVELOPPE MAX", capitalMax, "MENSUALITÉ MAX (35%)", mensualiteMax, "text-emerald-400");
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
+            myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Capital', 'Coût'], datasets: [{ data: [capitalMax, coutTotal], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: 'white', padding: 20 } } }, cutout: '70%' } });
+        }
 
+        function drawChart(labels, d1, d2, l1, l2, c1, c2) {
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            if (myChart) myChart.destroy();
+            let grad1 = ctx.createLinearGradient(0, 0, 0, 400); grad1.addColorStop(0, c1 + '80'); grad1.addColorStop(1, c1 + '00');
             myChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Capital (Le bien)', 'Coût du crédit (Perdu)'],
-                    datasets: [{
-                        data: [capital, interets],
-                        backgroundColor: ['#10b981', '#ef4444'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom', labels: { color: 'white', padding: 20 } } },
-                    cutout: '70%'
-                }
+                type: 'line',
+                data: { labels: labels, datasets: [{ label: l2, data: d2, borderColor: c2, backgroundColor: c2 + '40', borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0 }, { label: l1, data: d1, borderColor: c1, backgroundColor: grad1, borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: 'white', font: { family: 'Outfit' } } } }, scales: { x: { grid: { display: false }, ticks: { color: '#52525b' } }, y: { grid: { color: '#27272a' }, ticks: { color: '#52525b' }, stacked: true } } }
             });
         }
 
-        // Init
-        switchTab('epargne');
+        loadInputs();
+        if(document.getElementById('capital').value) calculerEpargne();
     </script>
 </body>
 </html>
