@@ -109,9 +109,9 @@
         .toggle-checkbox:checked + .toggle-label { background-color: #6366f1; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 bg-black bg-gradient-custom">
+<body class="min-h-screen flex flex-col items-center p-4 bg-black bg-gradient-custom">
 
-    <div id="app-container" class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6 pb-20">
+    <div id="app-container" class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6 pb-10 mt-4">
 
         <div class="lg:col-span-12 flex items-center justify-between mb-2">
             <div class="flex items-center gap-3">
@@ -281,6 +281,35 @@
         </div>
     </div>
 
+    <section class="max-w-4xl mx-auto px-6 py-12 text-gray-500 text-sm leading-relaxed space-y-12 mb-24">
+
+        <div class="text-center space-y-4">
+            <h2 class="text-2xl font-bold text-white">Pourquoi utiliser ce simulateur financier ?</h2>
+            <p>Contrairement aux calculettes bancaires classiques, <strong>My Finance</strong> est un outil 100% gratuit, sans publicité et respectueux de vos données. Il regroupe 5 outils essentiels pour prendre les bonnes décisions avec votre argent.</p>
+        </div>
+
+        <article class="space-y-2">
+            <h3 class="text-lg font-semibold text-indigo-400">📈 Comprendre les Intérêts Composés</h3>
+            <p>Albert Einstein les qualifiait de "8ème merveille du monde". Le principe est simple : vos intérêts produisent eux-mêmes des intérêts. Notre <strong>calculatrice d'intérêts composés</strong> vous permet de visualiser l'effet boule de neige sur 10, 20 ou 30 ans. Utilisez le mode "Ajusté à l'inflation" pour voir le pouvoir d'achat réel de votre patrimoine futur.</p>
+        </article>
+
+        <article class="space-y-2">
+            <h3 class="text-lg font-semibold text-pink-500">🏠 Acheter ou Louer : Le calcul mathématique</h3>
+            <p>C'est l'éternel débat. Faut-il "jeter son argent par les fenêtres" en louant ou "payer des intérêts à la banque" en achetant ? Notre simulateur <strong>Rent vs Buy</strong> compare mathématiquement les deux scénarios en prenant en compte les frais de notaire, la taxe foncière et le rendement de l'épargne placée. Il détermine l'année précise où l'achat devient rentable (le point mort).</p>
+        </article>
+
+        <article class="space-y-2">
+            <h3 class="text-lg font-semibold text-emerald-500">🚀 Calculer sa capacité d'emprunt</h3>
+            <p>Avant de visiter des biens, vous devez connaître votre enveloppe budgétaire. En se basant sur la règle des <strong>35% d'endettement</strong> (norme HCSF), cet outil calcule instantanément le montant maximum que vous pouvez emprunter auprès des banques, en incluant ou non les crédits déjà en cours.</p>
+        </article>
+
+        <footer class="text-center pt-10 text-xs text-gray-600 border-t border-white/10">
+            <p>&copy; 2024 My Finance. Outil à but pédagogique. Ne constitue pas un conseil en investissement financier.</p>
+            <p class="mt-2">Données stockées localement dans votre navigateur. Aucune donnée sensible n'est envoyée sur nos serveurs.</p>
+        </footer>
+
+    </section>
+
     <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 p-4 z-50 hidden-banner">
         <div class="max-w-4xl mx-auto cookie-glass rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -383,6 +412,7 @@
 
         // --- 5. GÉNÉRATION PDF ---
         function downloadPDF() {
+            // On ne prend que l'app container, sans le SEO et sans le bandeau
             const element = document.getElementById('app-container');
             const opt = {
                 margin: [10, 10],
