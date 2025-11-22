@@ -3,19 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Assistant Personnel</title>
+
+    <title>Assistant Financier - Simulateur Gratuit</title>
+    <meta name="description" content="L'outil ultime pour vos finances : Calculez vos intérêts composés, votre capacité d'emprunt et comparez l'achat vs la location. Gratuit, sans pub, sécurisé.">
+
+    <meta property="og:title" content="Devenez maître de vos finances 🚀">
+    <meta property="og:description" content="Simulateurs Gratuits : Crédit Immo, Rentabilité Locative, Épargne & Indépendance Financière.">
+    <meta property="og:image" content="https://img.icons8.com/fluency/500/bullish.png">
+    <meta property="og:type" content="website">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="https://img.icons8.com/fluency/180/bullish.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://img.icons8.com/fluency/32/bullish.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         /* ==========================================
-           DESIGN SYSTEM PERSONNALISÉ (CSS)
+           4. DESIGN SYSTEM (CSS)
         ========================================== */
 
         body {
@@ -25,13 +34,13 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Fond dégradé subtil (Bleu / Rose) */
+        /* Fond dégradé animé subtil */
         .bg-gradient-custom {
             background: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
                         radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
         }
 
-        /* Effet de verre (Glassmorphism) pour les panneaux */
+        /* Effet de verre (Panneaux principaux) */
         .glass-panel {
             background: rgba(22, 22, 26, 0.75);
             backdrop-filter: blur(30px);
@@ -42,7 +51,7 @@
             overflow: hidden;
         }
 
-        /* Design spécifique du bandeau Cookies */
+        /* Effet de verre (Bandeau Cookies) */
         .cookie-glass {
             background: rgba(20, 20, 25, 0.95);
             backdrop-filter: blur(40px);
@@ -51,7 +60,7 @@
             box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
         }
 
-        /* Champs de saisie (Inputs) */
+        /* Champs de saisie */
         .input-field {
             background: #0f0f11;
             border: 1px solid #2c2c30;
@@ -66,13 +75,13 @@
         }
         ::placeholder { color: #4b5563; opacity: 1; }
 
-        /* Barre latérale de navigation */
+        /* Barre latérale */
         .nav-sidebar {
             background: rgba(0,0,0,0.2);
             border-right: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* Boutons des onglets */
+        /* Boutons Onglets */
         .tab-btn {
             text-align: left;
             padding: 12px 16px;
@@ -90,14 +99,12 @@
         .tab-btn:hover { opacity: 1; background: rgba(255,255,255,0.03); }
         .tab-btn.active { opacity: 1; background: rgba(255,255,255,0.08); }
 
-        /* Utilitaires pour cacher les éléments */
+        /* Utilitaires */
         .hidden-section { display: none; }
         .hidden-banner { display: none !important; }
-
-        /* Cacher la barre de défilement tout en permettant le scroll */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-        /* Bouton Switch (Inflation) */
+        /* Switch Inflation */
         .toggle-checkbox:checked { right: 0; border-color: #6366f1; }
         .toggle-checkbox:checked + .toggle-label { background-color: #6366f1; }
     </style>
@@ -294,7 +301,7 @@
         // --- 1. CONFIGURATION GOOGLE ANALYTICS (CONSENT MODE V2) ---
         const GA_ID = 'G-M20W2D39X7';
 
-        // Définition initiale de la fonction gtag
+        // Définition initiale de la fonction gtag (avant le chargement)
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
 
@@ -330,7 +337,7 @@
                 'ad_personalization': status
             });
 
-            // Sauvegarde du choix
+            // Sauvegarde du choix dans le navigateur
             localStorage.setItem('cookieConsent', granted ? 'accepted' : 'refused');
             banner.classList.add('hidden-banner');
         }
@@ -339,6 +346,7 @@
         if (!consent) {
             setTimeout(() => banner.classList.remove('hidden-banner'), 1000);
         } else if (consent === 'accepted') {
+            // Si déjà accepté avant, on active le consentement tout de suite
             updateConsent(true);
         }
 
@@ -346,7 +354,7 @@
             updateConsent(accepte);
         }
 
-        // --- 3. CONFIGURATION GÉNÉRALE ---
+        // --- 3. CONFIGURATION GÉNÉRALE DU MOTEUR ---
         let myChart;
         Chart.defaults.color = '#6b7280';
         Chart.defaults.font.family = 'Outfit';
@@ -390,7 +398,7 @@
         function switchTab(tab) {
             const tabs = ['epargne', 'immo', 'capacite', 'objectif', 'rentbuy'];
 
-            // On cache tout
+            // On cache tous les onglets
             tabs.forEach(t => {
                 document.getElementById('form-' + t).classList.add('hidden-section');
                 document.getElementById('tab-' + t).classList.remove('active');
@@ -421,15 +429,15 @@
             document.getElementById('kpi-val-2').innerText = typeof v2 === 'number' ? formatMoney(v2) : v2;
             document.getElementById('kpi-val-2').className = "text-4xl font-bold mt-2 tracking-tight " + colorClass;
 
-            // Animation des blobs de couleur
+            // Animation des blobs de couleur en arrière-plan
             const blobClass = `absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-20 -mr-10 -mt-10 ${blobColor}`;
             document.getElementById('blob-1').className = blobClass;
             document.getElementById('blob-2').className = blobClass;
         }
 
-        // --- 8. MOTEURS DE CALCUL ---
+        // --- 8. MOTEURS DE CALCUL (LOGIQUE MÉTIER) ---
 
-        // -- ÉPARGNE --
+        // A. CALCUL ÉPARGNE
         function calculerEpargne() {
             const capital = parseFloat(document.getElementById('capital').value);
             const mensuel = parseFloat(document.getElementById('mensuel').value);
@@ -468,7 +476,7 @@
             drawChart(labels, dataInv, dataInt, "Capital Investi", "Intérêts", '#6366f1', '#a5b4fc');
         }
 
-        // -- OBJECTIF --
+        // B. CALCUL OBJECTIF
         function calculerObjectif() {
             const cible = parseFloat(document.getElementById('obj-montant').value);
             const duree = parseFloat(document.getElementById('obj-duree').value);
@@ -477,6 +485,7 @@
 
             if(isNaN(cible) || isNaN(duree)) return;
 
+            // Algorithme dichotomique pour trouver le taux
             let minRate = 0;
             let maxRate = 100;
             let foundRate = 0;
@@ -518,7 +527,7 @@
             drawChart(labels, dataCapital, dataInterets, "Vos Versements", "Intérêts Requis", '#d97706', '#fcd34d');
         }
 
-        // -- CRÉDIT IMMOBILIER --
+        // C. CALCUL CRÉDIT IMMO
         function calculerImmo() {
             let montant = parseFloat(document.getElementById('immo-montant').value);
             const taux = parseFloat(document.getElementById('immo-taux').value) / 100;
@@ -566,7 +575,7 @@
             drawChart(labels, dataCap, dataInt, "Remboursé", "Coût", '#db2777', '#f472b6');
         }
 
-        // -- LOUER vs ACHETER --
+        // D. CALCUL LOUER VS ACHETER
         function calculerRentBuy() {
             const loyer = parseFloat(document.getElementById('rb-loyer').value);
             const prix = parseFloat(document.getElementById('rb-prix').value);
@@ -574,6 +583,7 @@
 
             if(isNaN(loyer) || isNaN(prix)) return;
 
+            // Hypothèses
             const duree = 25;
             const tauxImmo = 0.04;
             const tauxEpargne = 0.03;
@@ -642,7 +652,7 @@
             });
         }
 
-        // -- CAPACITÉ D'EMPRUNT --
+        // E. CALCUL CAPACITÉ D'EMPRUNT
         function calculerCapacite() {
             const revenus = parseFloat(document.getElementById('revenus').value);
             const charges = parseFloat(document.getElementById('charges').value) || 0;
@@ -690,7 +700,7 @@
             });
         }
 
-        // --- 9. DESSIN GRAPHIQUE UNIFIÉ ---
+        // --- 9. DESSIN GRAPHIQUE UNIFIÉ (Ligne) ---
         function drawChart(labels, d1, d2, l1, l2, c1, c2) {
             const ctx = document.getElementById('financeChart').getContext('2d');
             if (myChart) myChart.destroy();
@@ -743,6 +753,7 @@
         }
 
         // --- 10. LANCEMENT INITIAL ---
+        // On charge les données sauvegardées et on lance l'onglet par défaut
         loadInputs();
         if(document.getElementById('capital').value) calculerEpargne();
 
